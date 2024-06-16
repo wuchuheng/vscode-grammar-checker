@@ -1,6 +1,6 @@
-# grammar-analyzer README
+# grammar-checker README
 
-This is the README for your extension "grammar-analyzer". After writing up a brief description, we recommend including the following sections.
+This is the README for your extension "grammar-checker". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 
@@ -69,3 +69,5 @@ You can author your README using Visual Studio Code. Here are some useful editor
 * [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
 **Enjoy!**
+
+Hello, everybody with the help of this extension you can analyze the grammar of the code you write. This extension ware helo very useful for those who is learning to code.

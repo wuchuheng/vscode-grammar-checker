@@ -1,7 +1,7 @@
 {
-  "name": "grammar-analyzer",
-  "displayName": "grammar analyzer",
-  "description": "A grammar analyzer incorect the pure text file in standard english grammar.",
+  "name": "grammar-checker",
+  "displayName": "grammar checker",
+  "description": "A grammar checker incorect the pure text file in standard english grammar.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.90.0"
@@ -9,15 +9,43 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:typescript",
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescriptreact",
+    "onLanguage:json",
+    "onLanguage:jsonc",
+    "onLanguage:markdown"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "grammar-analyzer.helloWorld",
-        "title": "Hello World"
+        "command": "simpleGrammarCheck.check",
+        "title": "Check Grammar in Comments"
       }
-    ]
+    ],
+    "diagnostics": {
+      "languages": [
+        "typescript",
+        "javascript",
+        "javascriptreact",
+        "typescriptreact",
+        "json",
+        "jsonc",
+        "markdown"
+      ],
+      "documentSelector": [
+        "typescript",
+        "javascript",
+        "javascriptreact",
+        "typescriptreact",
+        "json",
+        "jsonc",
+        "markdown"
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "pnpm run package",
@@ -31,17 +59,24 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.90.0",
     "@types/mocha": "^10.0.6",
-    "@types/node": "20.x",
+    "@types/node": "~20.14.2",
+    "@types/vscode": "^1.90.0",
     "@typescript-eslint/eslint-plugin": "^7.11.0",
     "@typescript-eslint/parser": "^7.11.0",
-    "eslint": "^8.57.0",
-    "typescript": "^5.4.5",
-    "ts-loader": "^9.5.1",
-    "webpack": "^5.92.0",
-    "webpack-cli": "^5.1.4",
     "@vscode/test-cli": "^0.0.9",
-    "@vscode/test-electron": "^2.4.0"
+    "@vscode/test-electron": "^2.4.0",
+    "eslint": "^8.57.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.92.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "languagetool-api": "^1.1.2",
+    "spellchecker": "^3.7.1",
+    "vscode-languageclient": "^9.0.1",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.11"
   }
 }
