@@ -1,0 +1,76 @@
+[
+    {
+        "id": 1,
+        "items": [
+            {
+                "title": "Fix incorrect use of verb tense",
+                "describe": [
+                    "Replace ",
+                    {
+                        "text": "loves",
+                        "isBold": true
+                    },
+                    " with ",
+                    {
+                        "text": "love",
+                        "isBold": true
+                    },
+                    " to correct the verb tense."
+                ],
+                "range": {
+                    "star": 5,
+                    "end": 9
+                },
+                "replacement": "love"
+            },
+            {
+                "title": "Capitalize the first letter of the sentence",
+                "describe": [
+                    "Capitalize the first letter of the sentence to make it a proper sentence."
+                ],
+                "range": {
+                    "star": 0,
+                    "end": 1
+                },
+                "replacement": ""
+            },
+            {
+                "title": "Remove extra space",
+                "describe": [
+                    "Remove the extra space between … of the sentence to make it a proper sentence."
+                ],
+                "range": {
+                    "star": 0,
+                    "end": 1
+                },
+                "replacement": ""
+            },
+            {
+                "title": "Remove the redundant 'an'",
+                "describe": [
+                    "Remove the redundant 'an'."
+                ],
+                "range": {
+                    "star": 2,
+                    "end": 4
+                },
+                "replacement": ""
+            },
+            {
+                "title": "Remove extra space",
+                "describe": [
+                    "Remove the extra space between words ",
+                    {
+                        "text": "  ",
+                        "isBold": true
+                    },
+                    " between 'efund.'"
+                ],
+                "range": {
+                    "star": 5,
+                    "end": 11
+                },
+                "replacement": ""
+            }
+        ]
+    ]
