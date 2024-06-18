@@ -22,6 +22,21 @@ describe("volcengine model", () => {
 
     // 2. Call the AI client to process the input data
     const response: ResponseType[] = await aiClient(input);
-    console.log(response);
+
+    // 3. Assert the response from the AI system
+    // 3.1 Assert the count of the response items is 2;
+    expect(response.length).toBe(2);
+
+    //3.2 Assert the first response item
+    const firstItem = response[0];
+    expect(firstItem.id).toBe(1);
+    // 3.2.1 Assert the length of items is greater than 0.
+    expect(firstItem.items.length).toBeGreaterThan(0);
+
+    // 3.3 Assert the second response item
+    const secondItem = response[1];
+    expect(secondItem.id).toBe(2);
+    // 3.3.1 Assert the length of items is greater than 0.
+    expect(secondItem.items.length).toBeGreaterThan(0);
   }, 600000);
 });
