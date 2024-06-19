@@ -86,12 +86,12 @@ export type InputType = {
  */
 export const aiClient = async (input: InputType): Promise<ResponseType[]> => {
   // 1. Get the bot base URL, token, and ID from environment variables
-  const { SECRET_KEY, BASE_URL, MODEL_ID } = process.env;
+  const { SECRET_KEY, API_URL, MODEL_ID } = process.env;
 
   // 2. Create a request to the OpenAI API
   const inputJson = JSON.stringify(input);
   const response = await axios.post(
-    `${BASE_URL}/chat/completions`,
+    `${API_URL}`,
     {
       model: MODEL_ID,
       messages: [
@@ -104,17 +104,21 @@ export const aiClient = async (input: InputType): Promise<ResponseType[]> => {
           1. 我给你的数据只能是JSON格式。
           2. 输入的JSON数据是完整且可被解析的。
           3. 我输入的JSON数据结构如下:
-          [
-            // 这是一个需要被检查的文本项,里面包含了ID和需要被语法纠正的内容共两个字段
-            {
-              // ID是一个非常重要的字段,后面的纠错结果会包含这个ID,用来告诉开发者这个纠错结果是针对哪个文本项的
-              "id":1," 
-              // content是需要被检查的文本内容
-              content":"There are mitsake."
-            }
-            // 这里可以有多个文本项...
-            ...
-          ]
+          {
+            // fileName是一个字符串,代表了这个文本项所在的文件名
+            "fileName": "README.md",
+            "items": [
+              // 这是一个需要被检查的文本项,里面包含了ID和需要被语法纠正的内容共两个字段
+              {
+                // ID是一个非常重要的字段,后面的纠错结果会包含这个ID,用来告诉开发者这个纠错结果是针对哪个文本项的
+                "id":1," 
+                // content是需要被检查的文本内容
+                content":"There are mitsake."
+              }
+              // 这里可以有多个文本项...
+              ...
+            ]
+          }
           
           ## 数据输出说明:
           1, 数据输出的结果只能是JSON格式,不能包含其他格式。
@@ -154,7 +158,7 @@ export const aiClient = async (input: InputType): Promise<ResponseType[]> => {
             // 这里可以有多个文本项的纠错结果与我输入的文本项一一对应，记住，是要一一对应的，多余的不要，如我给你的文本项只有一个，那么输出的结果也只能有一个文本项的纠错结果，多余的不准生成
             ...
           ]
-        4. 输出的纠正结果中不能有冗余无用的数据，用户输入为: '[{"id":1,"content":"She  don\'t like apples."}]',则输出的结果要满足以下条件：
+        4. 输出的纠正结果中不能有冗余无用的数据，用户输入为: '{"fileName": "README.md", "items": [{"id":1,"content":"She  don\'t like apples."}]}',则输出的结果要满足以下条件：
         - 从用户输入的数据来看看,文本项的数量是1,那么输出的结果也只能有一个文本项的纠错结果。输出的结果中不能有多余的文本项。如:
         \`\`\`[
         // 因为用户输入的数据中只有一个文本项，所以输出的结果也只能有一个文本项的纠错结果不能有多余的文本项，这一点必须做到。
