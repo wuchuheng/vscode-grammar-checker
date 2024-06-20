@@ -22,8 +22,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "simpleGrammarCheck.check",
-        "title": "Check Grammar in Comments"
+        "command": "GrammarChecker.check",
+        "title": "Grammar check"
       }
     ],
     "diagnostics": {
