@@ -11,7 +11,8 @@
       "request": "launch",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "${workspaceFolder}/src/test/sample.ts"
+        "${workspaceFolder}/src/test/workspaceForTest/",
+        "${workspaceFolder}/src/test/workspaceForTest/sample.ts"
       ],
       "outFiles": ["${workspaceFolder}/dist/**/*.js"],
       "preLaunchTask": "${defaultBuildTask}"

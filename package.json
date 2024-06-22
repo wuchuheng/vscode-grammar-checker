@@ -45,6 +45,16 @@
         "jsonc",
         "markdown"
       ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "Grammar checker Extension Configuration",
+      "properties": {
+        "grammarChecker.modelSecretKey": {
+          "default": "",
+          "description": "The secret key of the model will be used to access the model."
+        }
+      }
     }
   },
   "scripts": {

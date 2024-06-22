@@ -1,0 +1,4 @@
+{
+  // The secret key for accessing the API of Zhipu AI.
+  "grammarChbvecker.modelSecretKey": "<YOUR_SECRET_KEY>"
+}

@@ -21,7 +21,7 @@ export class CodeActionProvider implements vscode.CodeActionProvider {
     diagnostic: vscode.Diagnostic
   ): vscode.CodeAction {
     const fix = new vscode.CodeAction(
-      `Replace "helo" with "hello"`,
+      'Replace "helo" with "hello"',
       vscode.CodeActionKind.QuickFix
     );
     fix.edit = new vscode.WorkspaceEdit();

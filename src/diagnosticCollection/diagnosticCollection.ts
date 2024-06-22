@@ -1,3 +1,3 @@
-import * as vscode from "vscode";
+import * as vscode from 'vscode';
 export const diagnosticCollection =
-  vscode.languages.createDiagnosticCollection("GrammarChecker");
+  vscode.languages.createDiagnosticCollection('GrammarChecker');

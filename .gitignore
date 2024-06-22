@@ -4,3 +4,5 @@ node_modules
 .vscode-test/
 *.vsix
 .env
+src/test/workspaceForTest/.vscode/settings.json
+src/tmp.txt

@@ -6,6 +6,7 @@ export class HoverProvider implements vscode.HoverProvider {
     position: vscode.Position,
     token: vscode.CancellationToken
   ): vscode.ProviderResult<vscode.Hover> {
+    const hello = 1;
     const range = document.getWordRangeAtPosition(position, /helo/);
     if (range) {
       const markdownString = new vscode.MarkdownString();
