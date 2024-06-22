@@ -28,6 +28,15 @@ There is a incorrect line: there is a mitsake.`,
             id: 3,
             content: "There is a dogs.",
           },
+          {
+            id: 4,
+            content: "# This is a incorrect comment.\n# There is a error here.",
+          },
+          {
+            id: 5,
+            content:
+              "/*\nThis is a block comment.\nThis block comment has an error: there is a dogs.\n */",
+          },
         ],
       };
 
@@ -39,7 +48,7 @@ There is a incorrect line: there is a mitsake.`,
 
     // 2.3 Check the results
     for (const result of results) {
-      expect(result).toEqual([1, 3]);
+      expect(result).toEqual([1, 3, 4, 5]);
     }
   }, 600000);
 });
