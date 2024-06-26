@@ -5,6 +5,7 @@ export const API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
 
 // The model id of the language model.
 export const MODEL_ID = "glm-4-flash";
+// export const MODEL_ID = "glm-4";
 
 /**
  * Get the secret key from the configuration variables that are provided by the user.

@@ -1,8 +1,5 @@
 import * as vscode from "vscode";
 import ts from "typescript";
-import { step1 } from "../utils/aiClient";
-import { getConfig } from "../utils/configUtil";
-import { log } from "console";
 
 interface Comment {
   text: string;
@@ -64,9 +61,6 @@ function extractComments(
 export const checkCommand = vscode.commands.registerCommand(
   "GrammarChecker.check",
   () => {
-    const config = getConfig();
-    console.log(config);
-
     // const editor = vscode.window.activeTextEditor;
     // if (editor === null) {
     //   return;
@@ -75,11 +69,9 @@ export const checkCommand = vscode.commands.registerCommand(
     // if (editor!.document.languageId !== 'typescript') {
     //   return;
     // }
-
     // // 2. Get all comments from the TypeScript file.
     // const sourceText = editor!.document.getText();
     // const comments = extractComments(sourceText, editor!.document);
-
     // // 3. Create a map of comments with an ID.
     // let id = 1;
     // const idMapComment: Map<number, Comment> = new Map();
@@ -87,17 +79,13 @@ export const checkCommand = vscode.commands.registerCommand(
     //   idMapComment.set(id, comment);
     //   id++;
     // });
-
     // // 4. Get the related file name with extension, like: hello.ts
     // const fileName = editor!.document.fileName.split('/').pop();
-
     // // 5. Send the comments to AI for checking the grammar and spelling.
-
     // const items: Array<{ id: number; content: string }> = [];
     // idMapComment.forEach((comment, id) => {
     //   items.push({ id, content: comment.text });
     // });
-
     // step1({ fileName: fileName!, items })
     //   .then((res) => {
     //     console.log(res);
