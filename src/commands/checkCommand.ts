@@ -1,111 +1,45 @@
 import * as vscode from "vscode";
 import ts from "typescript";
-
-interface Comment {
-  text: string;
-  start: vscode.Position;
-  end: vscode.Position;
-}
-
-function extractComments(
-  sourceCode: string,
-  document: vscode.TextDocument
-): Comment[] {
-  const sourceFile = ts.createSourceFile(
-    "temp.ts",
-    sourceCode,
-    ts.ScriptTarget.Latest,
-    true
-  );
-
-  const comments: Comment[] = [];
-  const addedCommentPositions = new Set<number>();
-
-  function visit(node: ts.Node) {
-    const commentRanges = [
-      ...(ts.getLeadingCommentRanges(
-        sourceFile.getFullText(),
-        node.getFullStart()
-      ) || []),
-      ...(ts.getTrailingCommentRanges(
-        sourceFile.getFullText(),
-        node.getEnd()
-      ) || []),
-    ];
-
-    commentRanges.forEach((commentRange) => {
-      // Check if the comment's start position has already been added
-      if (!addedCommentPositions.has(commentRange.pos)) {
-        addedCommentPositions.add(commentRange.pos); // Mark this start position as added
-        const commentText = sourceFile
-          .getFullText()
-          .slice(commentRange.pos, commentRange.end);
-        comments.push({
-          text: commentText,
-          start: document.positionAt(commentRange.pos),
-          end: document.positionAt(commentRange.end),
-        });
-      }
-    });
-
-    ts.forEachChild(node, visit);
-  }
-
-  visit(sourceFile);
-  return comments;
-}
+import { correctComments } from "../api/correctComments";
+import { wordLevenshteinDistance } from "../utils/shteinDistance";
+import { extractComments } from "../utils/typescriptUtil";
 
 /**
  * Registers the "GrammarChecker.check" command.
  */
 export const checkCommand = vscode.commands.registerCommand(
   "GrammarChecker.check",
-  () => {
-    // const editor = vscode.window.activeTextEditor;
-    // if (editor === null) {
-    //   return;
-    // }
-    // // 1. If the file is not a TypeScript file, return.
-    // if (editor!.document.languageId !== 'typescript') {
-    //   return;
-    // }
-    // // 2. Get all comments from the TypeScript file.
-    // const sourceText = editor!.document.getText();
-    // const comments = extractComments(sourceText, editor!.document);
-    // // 3. Create a map of comments with an ID.
-    // let id = 1;
-    // const idMapComment: Map<number, Comment> = new Map();
-    // comments.forEach((comment) => {
-    //   idMapComment.set(id, comment);
-    //   id++;
-    // });
-    // // 4. Get the related file name with extension, like: hello.ts
-    // const fileName = editor!.document.fileName.split('/').pop();
-    // // 5. Send the comments to AI for checking the grammar and spelling.
-    // const items: Array<{ id: number; content: string }> = [];
-    // idMapComment.forEach((comment, id) => {
-    //   items.push({ id, content: comment.text });
-    // });
-    // step1({ fileName: fileName!, items })
-    //   .then((res) => {
-    //     console.log(res);
-    //     res.forEach((item) => {
-    //       const { id, items } = item;
-    //       const text = idMapComment.get(id)?.text;
-    //       items.forEach((correctItem) => {
-    //         const deletedWord = text?.slice(
-    //           correctItem.range.start,
-    //           correctItem.range.end
-    //         );
-    //         console.log(`Full text: ${text}`);
-    //         console.log(`Delete world: ${deletedWord}`);
-    //         console.log(`Replace world: ${correctItem.replacement}`);
-    //       });
-    //     });
-    //   })
-    //   .catch((err) => {
-    //     console.error(err);
-    //   });
+  async () => {
+    // 1. Handling input.
+    // 1.1 Get the Comments from the TypeScript file.
+    const editor = vscode.window.activeTextEditor;
+    if (editor === null) {
+      return;
+    }
+    // 1.2 If the file is not a TypeScript file, return.
+    if (editor!.document.languageId !== "typescript") {
+      return;
+    }
+
+    // 1.3 Get the comments from the TypeScript file.
+    const sourceText = editor!.document.getText();
+    const comments = extractComments(sourceText, editor!.document);
+
+    // 2. Processing logic.
+    // 2.1 Get the corrected comments.
+    const tasks: Promise<string>[] = [];
+    comments.forEach((comment) => {
+      tasks.push(correctComments(comment.text));
+    });
+    const correctedComments = await Promise.all(tasks);
+
+    // 2.2 Convert the corrected comments to list of deditions.
+    correctedComments.forEach((correctedComment, index) => {
+      const comment = comments[index];
+      const editions = wordLevenshteinDistance(comment.text, correctedComment);
+    });
+
+    // 3. Return the result.
   }
 );
 

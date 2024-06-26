@@ -1,3 +1,6 @@
+import * as vscode from "vscode";
+import ts from "typescript";
+
 /**
  * Format the comment by using the standard format.
  */
@@ -66,3 +69,66 @@ export const formatSingleLineComment = (content: string): string => {
 
   return content;
 };
+
+/**
+ * Extract comments from the source code of a TypeScript file.
+ */
+export interface Comment {
+  text: string;
+  start: vscode.Position;
+  end: vscode.Position;
+}
+
+/**
+ *  Extract comments from the source code of a TypeScript file.
+ * @param sourceCode
+ * @param document
+ * @returns
+ */
+export function extractComments(
+  sourceCode: string,
+  document: vscode.TextDocument
+): Comment[] {
+  const sourceFile = ts.createSourceFile(
+    "temp.ts",
+    sourceCode,
+    ts.ScriptTarget.Latest,
+    true
+  );
+
+  const comments: Comment[] = [];
+  const addedCommentPositions = new Set<number>();
+
+  function visit(node: ts.Node) {
+    const commentRanges = [
+      ...(ts.getLeadingCommentRanges(
+        sourceFile.getFullText(),
+        node.getFullStart()
+      ) || []),
+      ...(ts.getTrailingCommentRanges(
+        sourceFile.getFullText(),
+        node.getEnd()
+      ) || []),
+    ];
+
+    commentRanges.forEach((commentRange) => {
+      // Check if the comment's start position has already been added
+      if (!addedCommentPositions.has(commentRange.pos)) {
+        addedCommentPositions.add(commentRange.pos); // Mark this start position as added
+        const commentText = sourceFile
+          .getFullText()
+          .slice(commentRange.pos, commentRange.end);
+        comments.push({
+          text: commentText,
+          start: document.positionAt(commentRange.pos),
+          end: document.positionAt(commentRange.end),
+        });
+      }
+    });
+
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+  return comments;
+}
