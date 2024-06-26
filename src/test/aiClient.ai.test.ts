@@ -206,5 +206,10 @@ describe("The test for the wordLevenshteinDistance", () => {
         toWord: " is",
       },
     ]);
+
+    // 4. Nothing to change test case
+    testItem = { source: "There is a dog", target: "There is a dog" };
+    result = wordLevenshteinDistance(testItem.source, testItem.target);
+    expect(result).toEqual([]);
   });
 });
