@@ -1,6 +1,8 @@
+import { get } from "axios";
+
 type EditType = "insert" | "delete" | "modify";
 
-interface EditOperation {
+export interface EditOperation {
   type: EditType;
   sourceCharIndex: number;
   sourceCharToIndex: number;
@@ -10,11 +12,11 @@ interface EditOperation {
   toWord: string;
 }
 
-function tokenize(sentence: string): string[] {
+export function tokenize(sentence: string): string[] {
   return sentence.match(/[ ]+|[^ ]+/gm) || [];
 }
 
-function calculateLevenshteinDistance(
+export function calculateLevenshteinDistance(
   sourceTokens: string[],
   targetTokens: string[]
 ): EditOperation[] {
@@ -164,38 +166,59 @@ const pushDeleteItemToEdits = (
   return inputEdits;
 };
 
-const convertWordIndexToCharIndex = (
+// 2.1 Crate the index of the words map the length of the words.
+type IndexMapToken = Map<
+  number,
+  { start: number; end: number; length: number }
+>;
+
+/**
+ * Transform the word index to char index
+ *
+ * @param source
+ * @param target
+ * @param inputEdits
+ */
+export const convertWordIndexToCharIndex = (
   source: string,
   target: string,
   inputEdits: EditOperation[]
-): void => {
+): EditOperation[] => {
   // 2. Processing Logic
   // 2.1 Crate the index of the words map the length of the words.
-  const tokens = tokenize(source);
-  const sourceIndexMapTokenLength: Map<number, number> = new Map();
-  tokens.reduce((acc, token, index) => {
-    sourceIndexMapTokenLength.set(index, acc);
-    return acc + token.length;
-  }, 0);
-
-  const targetTokens = tokenize(target);
-  const targetIndexMapTokenLength: Map<number, number> = new Map();
-  targetTokens.reduce((acc, token, index) => {
-    targetIndexMapTokenLength.set(index, acc);
-    return acc + token.length;
-  }, 0);
+  const sourceIndexMapToken = indexMapToken(source);
+  const targetIndexMapToken = indexMapToken(target);
 
   // 2.2 Convert the word index to char index.
+  const result: EditOperation[] = [];
   for (const edit of inputEdits) {
-    edit.sourceCharIndex = sourceIndexMapTokenLength.get(edit.sourceCharIndex)!;
-    edit.sourceCharToIndex = sourceIndexMapTokenLength.get(
+    // 2.2.1 Convert the source index to char index
+    const sourceIndexInfo = getChartIndexRange(
+      sourceIndexMapToken,
+      edit.sourceCharIndex,
       edit.sourceCharToIndex
-    )!;
-    edit.targetCharIndex = targetIndexMapTokenLength.get(edit.targetCharIndex)!;
-    edit.targetCharToIndex = targetIndexMapTokenLength.get(
+    );
+
+    // 2.2.2 Convert the target index to char index
+    const targetIndexInfo = getChartIndexRange(
+      targetIndexMapToken,
+      edit.targetCharIndex,
       edit.targetCharToIndex
-    )!;
+    );
+
+    // 2.2.3 Create the new edit operation
+    const newEdit: EditOperation = {
+      ...edit,
+      targetCharIndex: targetIndexInfo.start,
+      targetCharToIndex: targetIndexInfo.end,
+      sourceCharIndex: sourceIndexInfo.start,
+      sourceCharToIndex: sourceIndexInfo.end,
+    };
+    result.push(newEdit);
   }
+
+  // 3. Return the result.
+  return result;
 };
 
 /**
@@ -214,10 +237,52 @@ export function wordLevenshteinDistance(
   const sourceTokens = tokenize(sourceSentence);
   const targetTokens = tokenize(targetSentence);
   // 2.2 Calculate the Levenshtein distance
-  const edits = calculateLevenshteinDistance(sourceTokens, targetTokens);
+  let edits = calculateLevenshteinDistance(sourceTokens, targetTokens);
 
-  // 2.3 Convert the word index to char index
-  convertWordIndexToCharIndex(sourceSentence, targetSentence, edits);
+  // 2.3 Convert the word index to char ut.index
+  edits = convertWordIndexToCharIndex(sourceSentence, targetSentence, edits);
 
   return edits;
 }
+
+type ChartIndexRange = {
+  start: number;
+  end: number;
+};
+
+/**
+ * Get the range of the chart index from the word index.
+ *
+ */
+export const getChartIndexRange = (
+  indexMapToken: IndexMapToken,
+  charIndex: number,
+  charToIndex: number
+): ChartIndexRange => {
+  // 1. Handling input.
+
+  // 2.1 Convert the source index to char index
+  const token = indexMapToken.get(charIndex)!;
+  const start = token.start;
+  const end = indexMapToken.has(charToIndex)
+    ? indexMapToken.get(charToIndex)!.end
+    : token.end;
+
+  return { start, end };
+};
+
+export const indexMapToken = (source: string): IndexMapToken => {
+  const tokens = tokenize(source);
+  const indexMapToken: IndexMapToken = new Map();
+  tokens.reduce((acc, token, index) => {
+    const end = acc + token.length;
+    indexMapToken.set(index, {
+      start: acc,
+      end: end - 1,
+      length: token.length,
+    });
+    return end;
+  }, 0);
+
+  return indexMapToken;
+};

@@ -1,8 +1,21 @@
 import * as vscode from "vscode";
 import ts from "typescript";
 import { correctComments } from "../api/correctComments";
-import { wordLevenshteinDistance } from "../utils/shteinDistance";
-import { extractComments } from "../utils/typescriptUtil";
+import {
+  EditOperation,
+  wordLevenshteinDistance,
+} from "../utils/shteinDistance";
+import { Comment, extractComments } from "../utils/typescriptUtil";
+import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
+import {
+  convertEditionIndexToEndPotion,
+  convertEditionIndexToStartPotion,
+} from "../utils/diagnosticUtil";
+
+export type CommentBindEdition = {
+  comment: Comment;
+  editions: EditOperation[];
+};
 
 /**
  * Registers the "GrammarChecker.check" command.
@@ -34,9 +47,44 @@ export const checkCommand = vscode.commands.registerCommand(
     const correctedComments = await Promise.all(tasks);
 
     // 2.2 Convert the corrected comments to list of deditions.
+
+    const commentBindEditions: CommentBindEdition[] = [];
     correctedComments.forEach((correctedComment, index) => {
       const comment = comments[index];
       const editions = wordLevenshteinDistance(comment.text, correctedComment);
+      commentBindEditions.push({ comment, editions });
+    });
+
+    // 2.3 Add the diagnostics to the editor.
+    const diagnostics: vscode.Diagnostic[] = [];
+    commentBindEditions.forEach((commentBindEdition, index) => {
+      commentBindEdition.editions.forEach((edition) => {
+        if (edition.sourceCharToIndex === undefined) {
+          console.log(edition);
+          debugger;
+        }
+        const start = convertEditionIndexToStartPotion(
+          commentBindEdition.comment,
+          edition
+        );
+        const end = convertEditionIndexToEndPotion(
+          commentBindEdition.comment,
+          edition
+        );
+
+        // commentBindEdition.comment.text;
+        // edition.sourceCharIndex;
+        // commentBindEdition.comment.start;
+        // const range = new vscode.Range(start, end);
+        // const diagnostic = new vscode.Diagnostic(
+        //   range,
+        //   "Correct your spelling",
+        //   vscode.DiagnosticSeverity.Warning
+        // );
+        // diagnostic.source = "GrammarChecker";
+        // diagnostics.push(diagnostic);
+        // diagnosticCollection.set(document.uri, diagnostics);
+      });
     });
 
     // 3. Return the result.

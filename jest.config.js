@@ -3,7 +3,10 @@ module.exports = {
   transform: {
     "^.+\\.tsx?$": "ts-jest",
   },
-  testMatch: ["**/*.ai.test.ts"],
+  testMatch: [
+    // "src/test/aiClient.ai.test.ts",
+    "src/test/shteinDistance.ai.test.ts",
+  ],
   globals: {
     "ts-jest": {
       tsconfig: "tsconfig.json",

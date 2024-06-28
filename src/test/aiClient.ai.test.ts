@@ -211,5 +211,29 @@ describe("The test for the wordLevenshteinDistance", () => {
     testItem = { source: "There is a dog", target: "There is a dog" };
     result = wordLevenshteinDistance(testItem.source, testItem.target);
     expect(result).toEqual([]);
+
+    // 5. Overflown test case
+    testItem = { source: "/ comment1: helo", target: "// comment1: hello" };
+    result = wordLevenshteinDistance(testItem.source, testItem.target);
+    expect(result).toEqual([
+      {
+        type: "modify",
+        sourceCharIndex: 0,
+        sourceCharToIndex: 2,
+        targetCharIndex: 0,
+        targetCharToIndex: 3,
+        fromWord: "/",
+        toWord: "//",
+      },
+      {
+        type: "modify",
+        sourceCharIndex: 12,
+        sourceCharToIndex: 16,
+        targetCharIndex: 13,
+        targetCharToIndex: 18,
+        fromWord: "helo",
+        toWord: "hello",
+      },
+    ]);
   });
 });
