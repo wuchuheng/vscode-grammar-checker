@@ -3,15 +3,13 @@ module.exports = {
   transform: {
     "^.+\\.tsx?$": "ts-jest",
   },
-  testMatch: [
-    // "src/test/aiClient.ai.test.ts",
-    "src/test/shteinDistance.ai.test.ts",
-  ],
+  testMatch: ["**/src/test/jest/*.test.ts"],
   globals: {
     "ts-jest": {
       tsconfig: "tsconfig.json",
     },
   },
+  // Add the testPathIgnorePatterns option here
   moduleDirectories: ["node_modules", "src"],
   modulePathIgnorePatterns: [
     "<rootDir>/.vscode-test/vscode-darwin-arm64-1.90.1",

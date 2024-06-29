@@ -67,7 +67,7 @@
     "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
     "lint": "eslint src --ext ts",
     "test": "vscode-test",
-    "test:ai": "jest --testMatch='**/*.ai.test.ts'"
+    "test:ai": "jest --config jest.config.js"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

@@ -1,5 +1,3 @@
-import { get } from "axios";
-
 type EditType = "insert" | "delete" | "modify";
 
 export interface EditOperation {
@@ -167,7 +165,7 @@ const pushDeleteItemToEdits = (
 };
 
 // 2.1 Crate the index of the words map the length of the words.
-type IndexMapToken = Map<
+export type IndexMapToken = Map<
   number,
   { start: number; end: number; length: number }
 >;
@@ -191,7 +189,8 @@ export const convertWordIndexToCharIndex = (
 
   // 2.2 Convert the word index to char index.
   const result: EditOperation[] = [];
-  for (const edit of inputEdits) {
+  for (let index = 0; index < inputEdits.length; index++) {
+    const edit = inputEdits[index];
     // 2.2.1 Convert the source index to char index
     const sourceIndexInfo = getChartIndexRange(
       sourceIndexMapToken,
@@ -256,21 +255,46 @@ type ChartIndexRange = {
  */
 export const getChartIndexRange = (
   indexMapToken: IndexMapToken,
-  charIndex: number,
-  charToIndex: number
+  wordIndex: number,
+  wordToIndex: number
 ): ChartIndexRange => {
   // 1. Handling input.
 
-  // 2.1 Convert the source index to char index
-  const token = indexMapToken.get(charIndex)!;
+  // 2.1 If the charToIndex and charIndex are the same, and the index is not in the map, and the index is just the end of the sentence, then return the range of end of the sentence.
+  const isSameIndex = wordIndex === wordToIndex;
+  const isEndOfSentence = !indexMapToken.has(wordToIndex);
+  const isLastIndex = wordToIndex === indexMapToken.size;
+  if (isSameIndex && isEndOfSentence && isLastIndex) {
+    // 2.1.1 Get the last token
+    const last = indexMapToken.size - 1;
+    const lastToken = indexMapToken.get(last)!;
+    // 2.1.1 Return the range of the last token with the same index of the `last` index.
+    return { start: lastToken.end, end: lastToken.end };
+  }
+
+  // 2.2 Convert the source index to char index
+  // 2.2.1 Convert the start of position to char index
+  const token = indexMapToken.get(wordIndex)!;
   const start = token.start;
-  const end = indexMapToken.has(charToIndex)
-    ? indexMapToken.get(charToIndex)!.end
-    : token.end;
+
+  // 2.2.2 Convert the end of position to char index
+  let end: number;
+  const isEndLastWord = wordToIndex === indexMapToken.size;
+  if (isEndLastWord) {
+    const lastToken = indexMapToken.get(indexMapToken.size - 1)!;
+    end = lastToken.end;
+  } else {
+    end = indexMapToken.get(wordToIndex)!.start;
+  }
 
   return { start, end };
 };
 
+/**
+ * Get the index map of the tokens
+ * @param source
+ * @returns
+ */
 export const indexMapToken = (source: string): IndexMapToken => {
   const tokens = tokenize(source);
   const indexMapToken: IndexMapToken = new Map();
@@ -278,7 +302,7 @@ export const indexMapToken = (source: string): IndexMapToken => {
     const end = acc + token.length;
     indexMapToken.set(index, {
       start: acc,
-      end: end - 1,
+      end: end,
       length: token.length,
     });
     return end;

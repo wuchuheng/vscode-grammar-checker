@@ -1,10 +1,9 @@
 import { describe, test } from "@jest/globals";
-import { wordLevenshteinDistance } from "../utils/shteinDistance";
 import {
   formatSingleLineComment,
   formatTrackComment,
-} from "../utils/typescriptUtil";
-import { correctComments } from "../api/correctComments";
+} from "../../utils/typescriptUtil";
+import { correctComments } from "../../api/correctComments";
 
 describe("The test for Correcting the comments", () => {
   test("Corrected Testing", async () => {
@@ -117,123 +116,5 @@ describe("The test for Correcting the comments", () => {
     input = "There is a dogs here.";
     result = formatSingleLineComment(input);
     expect(result).toBe(expectedResult);
-  });
-});
-
-describe("The test for the wordLevenshteinDistance", () => {
-  test("Corrected the tracking of the comments", () => {
-    // Test cases with various sentences
-    let testItem = { source: "There are an dog", target: "There is a dog" };
-    let result = wordLevenshteinDistance(testItem.source, testItem.target);
-    expect(result).toEqual([
-      {
-        type: "modify",
-        sourceCharIndex: 6,
-        sourceCharToIndex: 9,
-        targetCharIndex: 6,
-        targetCharToIndex: 8,
-        fromWord: "are",
-        toWord: "is",
-      },
-      {
-        type: "modify",
-        sourceCharIndex: 10,
-        sourceCharToIndex: 12,
-        targetCharIndex: 9,
-        targetCharToIndex: 10,
-        fromWord: "an",
-        toWord: "a",
-      },
-    ]);
-
-    testItem = { source: "There are a dogs", target: "There is dog" };
-    result = wordLevenshteinDistance(testItem.source, testItem.target);
-    expect(result).toEqual([
-      {
-        type: "modify",
-        sourceCharIndex: 6,
-        sourceCharToIndex: 9,
-        targetCharIndex: 6,
-        targetCharToIndex: 8,
-        fromWord: "are",
-        toWord: "is",
-      },
-      {
-        type: "modify",
-        sourceCharIndex: 10,
-        sourceCharToIndex: 11,
-        targetCharIndex: 9,
-        targetCharToIndex: undefined,
-        fromWord: "a",
-        toWord: "dog",
-      },
-      {
-        type: "delete",
-        sourceCharIndex: 11,
-        sourceCharToIndex: undefined,
-        targetCharIndex: undefined,
-        targetCharToIndex: undefined,
-        fromWord: " dogs",
-        toWord: "",
-      },
-    ]);
-    // 3. Test the deleted test case
-    testItem = { source: "There   a is a dog", target: "There is a dog" }; // Deleted test case
-    result = wordLevenshteinDistance(testItem.source, testItem.target);
-    expect(result).toEqual([
-      {
-        type: "delete",
-        sourceCharIndex: 5,
-        sourceCharToIndex: 9,
-        targetCharIndex: 5,
-        targetCharToIndex: 5,
-        fromWord: "   a",
-        toWord: "",
-      },
-    ]);
-
-    // 4. Inserted test case
-    testItem = { source: "There a dog", target: "There is a dog" };
-    result = wordLevenshteinDistance(testItem.source, testItem.target);
-    expect(result).toEqual([
-      {
-        type: "insert",
-        sourceCharIndex: 5,
-        sourceCharToIndex: 5,
-        targetCharIndex: 5,
-        targetCharToIndex: 8,
-        fromWord: "",
-        toWord: " is",
-      },
-    ]);
-
-    // 4. Nothing to change test case
-    testItem = { source: "There is a dog", target: "There is a dog" };
-    result = wordLevenshteinDistance(testItem.source, testItem.target);
-    expect(result).toEqual([]);
-
-    // 5. Overflown test case
-    testItem = { source: "/ comment1: helo", target: "// comment1: hello" };
-    result = wordLevenshteinDistance(testItem.source, testItem.target);
-    expect(result).toEqual([
-      {
-        type: "modify",
-        sourceCharIndex: 0,
-        sourceCharToIndex: 2,
-        targetCharIndex: 0,
-        targetCharToIndex: 3,
-        fromWord: "/",
-        toWord: "//",
-      },
-      {
-        type: "modify",
-        sourceCharIndex: 12,
-        sourceCharToIndex: 16,
-        targetCharIndex: 13,
-        targetCharToIndex: 18,
-        fromWord: "helo",
-        toWord: "hello",
-      },
-    ]);
   });
 });
