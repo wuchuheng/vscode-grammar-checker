@@ -11,7 +11,7 @@ export interface EditOperation {
 }
 
 export function tokenize(sentence: string): string[] {
-  return sentence.match(/[ ]+|[^ ]+|[\n]+/gm) || [];
+  return sentence.match(/[ ]+|[^ |\n]+|[\n]+/gm) || [];
 }
 
 export function calculateLevenshteinDistance(

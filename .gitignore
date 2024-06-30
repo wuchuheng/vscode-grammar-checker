@@ -5,4 +5,4 @@ node_modules
 *.vsix
 .env
 src/test/workspaceForTest/.vscode/settings.json
-src/tmp.txt
+tmp/

@@ -6,6 +6,7 @@ import {
   formatSingleLineComment,
   formatTrackComment,
 } from "../utils/typescriptUtil";
+import LogUtil from "../utils/logUtil";
 
 /**
  *  Correct the comments by using the AI system
@@ -14,6 +15,13 @@ import {
  * @returns
  */
 export const correctComments = async (input: string): Promise<string> => {
+  // TODO: Remove test code.
+  return `/**
+* This is multi-line comments
+* There is a next line.
+* There are next lines.
+*/`;
+
   // 1. Input handling
 
   // 2. Processing Logic
@@ -97,5 +105,10 @@ export const correctComments = async (input: string): Promise<string> => {
   // 2.6 Format the single line comment.
   content = formatSingleLineComment(content);
 
+  // 2.7 Log.
+  LogUtil.debug(`AI input: ${input}`);
+  LogUtil.debug(`AI output: ${content}`);
+
+  // 3. Return the result.
   return content;
 };

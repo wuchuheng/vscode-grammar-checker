@@ -1,16 +1,13 @@
 import * as vscode from "vscode";
-import ts from "typescript";
 import { correctComments } from "../api/correctComments";
 import {
   EditOperation,
   wordLevenshteinDistance,
 } from "../utils/shteinDistance";
 import { Comment, extractComments } from "../utils/typescriptUtil";
+import { translateEditionToRange } from "../utils/vscodeUtils";
 import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
-import {
-  convertEditionIndexToEndPotion,
-  convertEditionIndexToStartPotion,
-} from "../utils/diagnosticUtil";
+import { setEdition } from "../store/store";
 
 export type CommentBindEdition = {
   comment: Comment;
@@ -57,33 +54,34 @@ export const checkCommand = vscode.commands.registerCommand(
 
     // 2.3 Add the diagnostics to the editor.
     const diagnostics: vscode.Diagnostic[] = [];
-    commentBindEditions.forEach((commentBindEdition, index) => {
+    const document = editor!.document;
+    commentBindEditions.forEach((commentBindEdition) => {
       commentBindEdition.editions.forEach((edition) => {
-        if (edition.sourceCharToIndex === undefined) {
-          console.log(edition);
-          debugger;
-        }
-        const start = convertEditionIndexToStartPotion(
-          commentBindEdition.comment,
-          edition
-        );
-        const end = convertEditionIndexToEndPotion(
+        const range = translateEditionToRange(
           commentBindEdition.comment,
           edition
         );
 
-        // commentBindEdition.comment.text;
-        // edition.sourceCharIndex;
-        // commentBindEdition.comment.start;
-        // const range = new vscode.Range(start, end);
-        // const diagnostic = new vscode.Diagnostic(
-        //   range,
-        //   "Correct your spelling",
-        //   vscode.DiagnosticSeverity.Warning
-        // );
-        // diagnostic.source = "GrammarChecker";
-        // diagnostics.push(diagnostic);
-        // diagnosticCollection.set(document.uri, diagnostics);
+        // 2.3.2 Create the diagnostic.
+        commentBindEdition.comment.text;
+        edition.sourceCharIndex;
+        commentBindEdition.comment.start;
+        const diagnostic = new vscode.Diagnostic(
+          range,
+          "Correct your spelling",
+          vscode.DiagnosticSeverity.Warning
+        );
+        diagnostic.source = "GrammarChecker";
+        diagnostics.push(diagnostic);
+        diagnosticCollection.set(document.uri, diagnostics);
+
+        // 2.4 Store the diagnostics to the store.
+        const fileName = editor!.document.fileName;
+        setEdition(fileName, range.start, {
+          edition,
+          comment: commentBindEdition.comment,
+          range,
+        });
       });
     });
 
