@@ -8,6 +8,7 @@ import { Comment, extractComments } from "../utils/typescriptUtil";
 import { translateEditionToRange } from "../utils/vscodeUtils";
 import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
 import { HoverInformation, setEditions } from "../store/store";
+import { diagnosticCode, diagnosticSource } from "../config/config";
 
 export type CommentBindEdition = {
   comment: Comment;
@@ -72,7 +73,9 @@ export const checkCommand = vscode.commands.registerCommand(
           "Correct your spelling",
           vscode.DiagnosticSeverity.Warning
         );
-        diagnostic.source = "GrammarChecker";
+        diagnostic.source = diagnosticSource;
+        diagnostic.code = diagnosticCode;
+
         diagnostics.push(diagnostic);
         diagnosticCollection.set(document.uri, diagnostics);
 

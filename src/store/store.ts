@@ -55,7 +55,7 @@ export const setEditions = (
 export const getEdition = (
   fileName: string,
   inputPosition: vscode.Position
-): HoverInformation => {
+): HoverInformation | undefined => {
   // 1. Handling input.
 
   // 1.1 Check if the file is exist in the store.
@@ -85,13 +85,6 @@ export const getEdition = (
     }
   }
 
-  // 2.3.1 If the result is not found, throw an error.
-  if (!result) {
-    throw new Error(
-      `File ${fileName} does not have any hoverInfomation at position ${inputPosition}.`
-    );
-  }
-
   // 3. Return result.
-  return result!;
+  return result;
 };

@@ -24,3 +24,9 @@ export const getSecretKey = (): string => {
 
   return SECRET_KEY || "";
 };
+
+/**
+ * The following constants are used to identify the source of the diagnostics. and the code action will be created based on the itentified diagnostics.
+ */
+export const diagnosticSource = "GrammarChecker";
+export const diagnosticCode = diagnosticSource;
