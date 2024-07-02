@@ -78,7 +78,7 @@ export const correctComments = async (input: string): Promise<string> => {
     // regex pattern to remove the wrapper
     const regexPattern = /(```\w{0}).*/;
     const match = content.match(regexPattern);
-    const markdownStr = match ? match[0] : "";
+    const markdownStr: string = match != null && match![0] ? match![0]! : "";
     if (markdownStr.length > 0) {
       content = content.substring(markdownStr.length);
     }

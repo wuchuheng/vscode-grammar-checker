@@ -7,7 +7,7 @@ import {
 import { Comment, extractComments } from "../utils/typescriptUtil";
 import { translateEditionToRange } from "../utils/vscodeUtils";
 import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
-import { setEdition } from "../store/store";
+import { HoverInformation, setEdition } from "../store/store";
 
 export type CommentBindEdition = {
   comment: Comment;
@@ -55,6 +55,7 @@ export const checkCommand = vscode.commands.registerCommand(
     // 2.3 Add the diagnostics to the editor.
     const diagnostics: vscode.Diagnostic[] = [];
     const document = editor!.document;
+    const hoverInformationList: HoverInformation[] = [];
     commentBindEditions.forEach((commentBindEdition) => {
       commentBindEdition.editions.forEach((edition) => {
         const range = translateEditionToRange(
@@ -75,15 +76,18 @@ export const checkCommand = vscode.commands.registerCommand(
         diagnostics.push(diagnostic);
         diagnosticCollection.set(document.uri, diagnostics);
 
-        // 2.4 Store the diagnostics to the store.
-        const fileName = editor!.document.fileName;
-        setEdition(fileName, range.start, {
+        // 2.4 Collect the hover information.
+        hoverInformationList.push({
           edition,
           comment: commentBindEdition.comment,
           range,
         });
       });
     });
+
+    // 2.5 Store the hover information to the store.
+    const fileName = editor!.document.fileName;
+    setEdition(fileName, hoverInformationList);
 
     // 3. Return the result.
   }

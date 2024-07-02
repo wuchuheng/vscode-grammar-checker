@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
-import * as fs from "fs";
 import { EditOperation } from "../utils/shteinDistance";
 import { Comment } from "../utils/typescriptUtil";
+import * as intervalTreeUtil from "../utils/intervalTreeUtil";
 
-type HoverInformation = {
+export type HoverInformation = {
   edition: EditOperation;
   comment: Comment;
   range: vscode.Range;
@@ -12,38 +12,39 @@ type HoverInformation = {
 /**
  * Store the hoverInfomation for each file.
  */
-const fileNameMapHoverInfomation: Map<
-  string,
-  Map<string, HoverInformation>
-> = new Map();
-
-const translatePositionToKey = (position: vscode.Position): string =>
-  `${position.line}:${position.character}`;
+const fileNameMapHoverInfomation: Map<string, intervalTreeUtil.IntervalTree> =
+  new Map();
 
 /**
- * Set a new edition to the store.
+ * Set the list of edition for a specific file.
  *
  * @param fileName
- * @param position
  * @param value
  */
 export const setEdition = (
   fileName: string,
-  position: vscode.Position,
-  value: HoverInformation
+  value: HoverInformation[]
 ): void => {
   // 1. Handling input.
 
   // 2. Processing logic.
-  // 2.1 If the file does not have any hoverInfomation, create a new map.
-  if (!fileNameMapHoverInfomation.has(fileName)) {
-    fileNameMapHoverInfomation.set(fileName, new Map());
+  // 2.1 Initialize the interval tree.
+  const intervalTree = new intervalTreeUtil.IntervalTree();
+  // 2.2 Insert all hoverInfomation to the interval tree from the middle to the end and then from the middle to the start.
+  const midleLength = ((value.length % 2) + value.length) / 2;
+  // 2.2.3 Insert from the middle to the end.
+  for (let i = midleLength - 1; i < value.length; i++) {
+    const item = value[i];
+    intervalTree.insert(item);
+  }
+  // 2.2.4 Insert from the middle to the start.
+  for (let i = midleLength - 2; i >= 0; i--) {
+    const item = value[i];
+    intervalTree.insert(item);
   }
 
-  // 2.2 Set the new edition to the store.
-  fileNameMapHoverInfomation
-    .get(fileName)!
-    .set(translatePositionToKey(position), value);
+  // 2.3 Store the interval tree to the map.
+  fileNameMapHoverInfomation.set(fileName, intervalTree);
 
   // 3. Return result.
 };
@@ -56,8 +57,8 @@ export const setEdition = (
  */
 export const getEdition = (
   fileName: string,
-  position: vscode.Position
-): HoverInformation => {
+  inputPosition: vscode.Position
+): intervalTreeUtil.QueryResult => {
   // 1. Handling input.
 
   // 1.1 Check if the file is exist in the store.
@@ -66,13 +67,13 @@ export const getEdition = (
   }
 
   // 1.2 Check if the position is exist in the store.
-  const key = translatePositionToKey(position);
-  if (!fileNameMapHoverInfomation.get(fileName)!.has(key)) {
-    throw new Error(`Position ${key} does not have any hoverInfomation.`);
+  if (!fileNameMapHoverInfomation.has(fileName)) {
+    throw new Error(`File ${fileName} does not have any hoverInfomation.`);
   }
 
   // 2. Processing logic.
-  const result = fileNameMapHoverInfomation.get(fileName)!.get(key)!;
+  const intervalTree = fileNameMapHoverInfomation.get(fileName)!;
+  const result = intervalTree.query(inputPosition);
 
   // 3. Return result.
   return result;
