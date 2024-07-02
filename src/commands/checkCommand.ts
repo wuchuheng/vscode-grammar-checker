@@ -7,7 +7,7 @@ import {
 import { Comment, extractComments } from "../utils/typescriptUtil";
 import { translateEditionToRange } from "../utils/vscodeUtils";
 import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
-import { HoverInformation, setEdition } from "../store/store";
+import { HoverInformation, setEditions } from "../store/store";
 
 export type CommentBindEdition = {
   comment: Comment;
@@ -87,7 +87,7 @@ export const checkCommand = vscode.commands.registerCommand(
 
     // 2.5 Store the hover information to the store.
     const fileName = editor!.document.fileName;
-    setEdition(fileName, hoverInformationList);
+    setEditions(fileName, hoverInformationList);
 
     // 3. Return the result.
   }

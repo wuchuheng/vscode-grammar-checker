@@ -1,18 +1,18 @@
 import * as vscode from "vscode";
 import { EditOperation } from "../utils/shteinDistance";
 import { Comment } from "../utils/typescriptUtil";
-import * as intervalTreeUtil from "../utils/intervalTreeUtil";
 
 export type HoverInformation = {
   edition: EditOperation;
   comment: Comment;
   range: vscode.Range;
 };
+type LineMapHoverInformations = Map<number, HoverInformation[]>;
 
 /**
  * Store the hoverInfomation for each file.
  */
-const fileNameMapHoverInfomation: Map<string, intervalTreeUtil.IntervalTree> =
+const fileNameMapLineDiagnatic: Map<string, LineMapHoverInformations> =
   new Map();
 
 /**
@@ -21,31 +21,28 @@ const fileNameMapHoverInfomation: Map<string, intervalTreeUtil.IntervalTree> =
  * @param fileName
  * @param value
  */
-export const setEdition = (
+export const setEditions = (
   fileName: string,
-  value: HoverInformation[]
+  values: HoverInformation[]
 ): void => {
   // 1. Handling input.
-
   // 2. Processing logic.
-  // 2.1 Initialize the interval tree.
-  const intervalTree = new intervalTreeUtil.IntervalTree();
-  // 2.2 Insert all hoverInfomation to the interval tree from the middle to the end and then from the middle to the start.
-  const midleLength = ((value.length % 2) + value.length) / 2;
-  // 2.2.3 Insert from the middle to the end.
-  for (let i = midleLength - 1; i < value.length; i++) {
-    const item = value[i];
-    intervalTree.insert(item);
+  // 2.1 If the key is not exist in the map, create a new map.
+  if (!fileNameMapLineDiagnatic.has(fileName)) {
+    fileNameMapLineDiagnatic.set(fileName, new Map());
   }
-  // 2.2.4 Insert from the middle to the start.
-  for (let i = midleLength - 2; i >= 0; i--) {
-    const item = value[i];
-    intervalTree.insert(item);
+  // 2.2 Inser the item to the map.
+  const lineMapHoverInformations = fileNameMapLineDiagnatic.get(fileName)!;
+  for (const value of values) {
+    const line = value.range.start.line;
+    // 2.2.1 If the key is not exist in the map, create a new array.
+    if (!lineMapHoverInformations.has(line)) {
+      lineMapHoverInformations.set(line, []);
+    }
+    // 2.2.2 Insert the item to the array.
+    const hoverInformations = lineMapHoverInformations.get(line)!;
+    hoverInformations.push(value);
   }
-
-  // 2.3 Store the interval tree to the map.
-  fileNameMapHoverInfomation.set(fileName, intervalTree);
-
   // 3. Return result.
 };
 
@@ -58,23 +55,43 @@ export const setEdition = (
 export const getEdition = (
   fileName: string,
   inputPosition: vscode.Position
-): intervalTreeUtil.QueryResult => {
+): HoverInformation => {
   // 1. Handling input.
 
   // 1.1 Check if the file is exist in the store.
-  if (!fileNameMapHoverInfomation.has(fileName)) {
+  if (!fileNameMapLineDiagnatic.has(fileName)) {
     throw new Error(`File ${fileName} does not have any hoverInfomation.`);
   }
 
   // 1.2 Check if the position is exist in the store.
-  if (!fileNameMapHoverInfomation.has(fileName)) {
+  if (!fileNameMapLineDiagnatic.has(fileName)) {
     throw new Error(`File ${fileName} does not have any hoverInfomation.`);
   }
 
   // 2. Processing logic.
-  const intervalTree = fileNameMapHoverInfomation.get(fileName)!;
-  const result = intervalTree.query(inputPosition);
+  // 2.1 Get the lineMapHoverInformations.
+  const lineMapHoverInformations = fileNameMapLineDiagnatic.get(fileName)!;
+
+  // 2.2 Get the list of hoverInfomation for the specific line.
+  const line = inputPosition.line;
+  const hoverInformations = lineMapHoverInformations.get(line)!;
+
+  // 2.3 Find the hoverInfomation that has the range that contains the position. and the closest to the position.
+  let result: HoverInformation | undefined = undefined;
+  for (const hoverInformation of hoverInformations) {
+    if (hoverInformation.range.contains(inputPosition)) {
+      result = hoverInformation;
+      break;
+    }
+  }
+
+  // 2.3.1 If the result is not found, throw an error.
+  if (!result) {
+    throw new Error(
+      `File ${fileName} does not have any hoverInfomation at position ${inputPosition}.`
+    );
+  }
 
   // 3. Return result.
-  return result;
+  return result!;
 };
