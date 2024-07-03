@@ -1,17 +1,41 @@
 import * as vscode from "vscode";
+import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
+import { declarations } from "../../dist/extension";
 
-export const generateDiagnosticCode = (range: vscode.Range): string => {
-  return `${range.start.line}:${range.start.character}-${range.end.line}:${range.end.character}`;
-};
+/**
+ * Generate the diagnostic code.
+ */
+let diagnosticCode: number = 1;
+export const generateCode = () => diagnosticCode++;
 
-export const decodeDiagnosticCode = (code: string): vscode.Range => {
-  const [start, end] = code.split("-");
-  const [startLine, startCharacter] = start.split(":");
-  const [endLine, endCharacter] = end.split(":");
-  const result = new vscode.Range(
-    new vscode.Position(Number(startLine), Number(startCharacter)),
-    new vscode.Position(Number(endLine), Number(endCharacter))
-  );
+let setDiagnosticsTimer: NodeJS.Timeout | null = null;
 
-  return result;
+/**
+ *
+ */
+export const reloadDiagnosticCollection = (
+  uri: vscode.Uri,
+  diagnostics: vscode.Diagnostic[]
+): void => {
+  // 1. Handling input.
+  // 2. Processing logic.
+  // 2.1 If the diagnostic collection already exists, delete it.
+  const isExist = diagnosticCollection.has(uri);
+  if (isExist) {
+    diagnosticCollection.delete(uri);
+  }
+
+  // 2.2 Set the diagnostics.
+  const setDiagnostics = () => diagnosticCollection.set(uri, diagnostics);
+  if (isExist) {
+    setDiagnosticsTimer && clearTimeout(setDiagnosticsTimer);
+    setDiagnosticsTimer = setTimeout(() => {
+      setDiagnostics();
+      setDiagnosticsTimer = null;
+    }, 100);
+  } else {
+    setDiagnostics();
+  }
+
+  // 3. Return the result.
 };

@@ -1,5 +1,5 @@
 /*
-* This is multi-line comments
- There is a next line.
- There is a next lines.
+ This is a multi-line comments
+ There is another lines.
+ There are more line.
 */

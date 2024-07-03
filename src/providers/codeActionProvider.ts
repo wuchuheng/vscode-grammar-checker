@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { getEdition } from "../store/store";
 import { fixCommandIdentifier, diagnosticSource } from "../config/config";
+import { DiagnasticStore } from "../store/diagnasticStore";
 
 export class CodeActionProvider implements vscode.CodeActionProvider {
   public static readonly providedCodeActionKinds = [
@@ -11,18 +11,12 @@ export class CodeActionProvider implements vscode.CodeActionProvider {
     document: vscode.TextDocument,
     range: vscode.Range,
     context: vscode.CodeActionContext,
-    _: vscode.CancellationToken
+    token: vscode.CancellationToken
   ): vscode.CodeAction[] {
     // 1. Handling input.
     // 2. Processing logic.
-    // 2.1 Get the hover information by the start position of the range.
-    const startPosition = range.start;
-    const hoverInformation = getEdition(document.fileName, startPosition);
-    if (!hoverInformation) {
-      return [];
-    }
 
-    // 2.2 Create the code action.
+    // 2.1 Create the code action.
     const result = context.diagnostics
       .filter((diagnostic) => diagnostic.source === diagnosticSource)
       .map((diagnostic) => this.fixIssueBuilder(document, diagnostic));
@@ -39,8 +33,11 @@ export class CodeActionProvider implements vscode.CodeActionProvider {
     // 1. Handling input.
     // 2. Processing logic.
     // 2.1 Find the hover information by the start position of the range.
-    const startPostion = diagnostic.range.start;
-    const hoverInformation = getEdition(document.fileName, startPostion);
+    const hoverInformation = DiagnasticStore.get({
+      fileName: document.fileName,
+      id: diagnostic.code as number,
+    });
+
     if (!hoverInformation) {
       throw new Error("Hover information not found.");
     }

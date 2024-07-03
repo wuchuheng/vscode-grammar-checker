@@ -7,10 +7,13 @@ import {
 import { Comment, extractComments } from "../utils/typescriptUtil";
 import { translateEditionToRange } from "../utils/vscodeUtils";
 import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
-import { HoverInformation, setEditions } from "../store/store";
+import { DiagnasticStore, HoverInformation } from "../store/diagnasticStore";
 import { diagnosticSource } from "../config/config";
 import { commandValidator } from "../validators/commandValidator";
-import { generateDiagnosticCode } from "../utils/diagnasticUtil";
+import {
+  generateCode,
+  reloadDiagnosticCollection,
+} from "../utils/diagnasticUtil";
 
 export type CommentBindEdition = {
   comment: Comment;
@@ -67,14 +70,13 @@ export const checkCommand = vscode.commands.registerCommand(
         commentBindEdition.comment.text;
         edition.sourceCharIndex;
         commentBindEdition.comment.start;
-        const code = generateDiagnosticCode(range);
         const diagnostic = new vscode.Diagnostic(
           range,
           "Correct your spelling",
           vscode.DiagnosticSeverity.Warning
         );
         diagnostic.source = diagnosticSource;
-        diagnostic.code = code;
+        diagnostic.code = generateCode();
         // 2.4 Collect the diagnostics for the step #2.6.
         diagnostics.push(diagnostic);
 
@@ -88,13 +90,20 @@ export const checkCommand = vscode.commands.registerCommand(
     });
 
     // 2.6 Update the diagnostic collection.
-    diagnosticCollection.has(document.uri) &&
-      diagnosticCollection.delete(document.uri);
-    diagnosticCollection.set(document.uri, diagnostics);
+    reloadDiagnosticCollection(document.uri, diagnostics);
 
     // 2.7 Store the hover information to the store.
     const fileName = editor!.document.fileName;
-    setEditions(fileName, hoverInformationList);
+    // 2.7.1 Clear the diagnostic in the store for this file.
+    DiagnasticStore.clear(fileName);
+    // 2.7.2 Add the diagnostic to the store.
+    hoverInformationList.forEach((item) => {
+      DiagnasticStore.set({
+        fileName,
+        id: item.diagnostic.code as number,
+        value: item,
+      });
+    });
 
     // 3. Return the result.
   }

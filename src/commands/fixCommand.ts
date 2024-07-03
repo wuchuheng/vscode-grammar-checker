@@ -2,10 +2,10 @@ import * as vscode from "vscode";
 import { EditOperation } from "../utils/shteinDistance";
 import { Comment } from "../utils/typescriptUtil";
 import { fixCommandIdentifier } from "../config/config";
-import { HoverInformation, removeEdition } from "../store/store";
+import { DiagnasticStore, HoverInformation } from "../store/diagnasticStore";
 import { supportedLanguages } from "../config/config";
 import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
-import { generateDiagnosticCode } from "../utils/diagnasticUtil";
+import { reloadDiagnosticCollection } from "../utils/diagnasticUtil";
 
 export type CommentBindEdition = {
   comment: Comment;
@@ -57,23 +57,45 @@ export const fixCommand = vscode.commands.registerCommand(
     // Apply the edit
     vscode.workspace.applyEdit(edit);
 
-    // 2.2 Update the diagnostics for the document.
-    // 2.2.1 Remove the inputDiagnostic from the diagnostic collection.
-    const newDiagnostics = diagnosticCollection
-      .get(document.uri)!
-      .filter((diagnostic) => {
-        return diagnostic.code !== inputDiagnostic.code;
-      });
+    // 2.2 Update the hover information.
+    // 2.2.1 Remove the hover information from the store.
+    DiagnasticStore.delete({
+      fileName: document.fileName,
+      id: inputDiagnostic.code as number,
+    });
 
-    // 2.2.2 Update the diagnostic collection with the new diagnostics.
-    diagnosticCollection.set(document.uri, newDiagnostics);
+    // 2.3 Update the diagnostics for the document.
+    const newDiagnostics: vscode.Diagnostic[] = [];
+    for (const diagnostic of diagnosticCollection.get(document.uri)!) {
+      // 2.3.1  Pick the new diagnostics.
+      if (diagnostic.code !== inputDiagnostic.code) {
+        const isSameLine =
+          inputDiagnostic.range.start.line === diagnostic.range.start.line;
+        const isBehing =
+          inputDiagnostic.range.end.character <=
+          diagnostic.range.start.character;
+        const changedWordCount =
+          hoverInformation.edition.toWord.length -
+          hoverInformation.edition.fromWord.length;
+        // 2.3.2 Update the range of the diagnostic when the diagnostic is behind the inputDiagnostic.
+        if (isSameLine && isBehing && changedWordCount !== 0) {
+          const startLine = diagnostic.range.start.line;
+          const startChart =
+            diagnostic.range.start.character + changedWordCount;
+          const endLine = diagnostic.range.end.line;
+          const endChart = diagnostic.range.end.character + changedWordCount;
+          const newRange = new vscode.Range(
+            new vscode.Position(startLine, startChart),
+            new vscode.Position(endLine, endChart)
+          );
+          diagnostic.range = newRange;
+        }
 
-    // 2.3 Update the hover information.
-    // 2.3.1 Remove the item from the hover information.
-    removeEdition(
-      document.fileName,
-      generateDiagnosticCode(inputDiagnostic.range)
-    );
+        newDiagnostics.push(diagnostic);
+      }
+    }
+    // 2.3.2 Clear the old diagnostics and set the new diagnostics.
+    reloadDiagnosticCollection(document.uri, newDiagnostics);
 
     // 3. Return the result.
   }

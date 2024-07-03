@@ -15,12 +15,11 @@ import LogUtil from "../utils/logUtil";
  * @returns
  */
 export const correctComments = async (input: string): Promise<string> => {
-  // TODO: Remove test code.
-  return `/**
-* This is multi-line comments
-* There is a next line.
-* There are next lines.
-*/`;
+  //   return `/**
+  // * This is multi-line comments
+  // * There is a next line.
+  // * There are next lines.
+  // */`;
 
   // 1. Input handling
 
