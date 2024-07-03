@@ -1,8 +1,9 @@
-import * as vscode from 'vscode';
-import { HoverProvider } from './providers/hoverProvider';
-import { CodeActionProvider } from './providers/codeActionProvider';
-import { checkCommand } from './commands/checkCommand';
-import { diagnosticCollection } from './diagnosticCollection/diagnosticCollection';
+import * as vscode from "vscode";
+import { HoverProvider } from "./providers/hoverProvider";
+import { CodeActionProvider } from "./providers/codeActionProvider";
+import { checkCommand } from "./commands/checkCommand";
+import { diagnosticCollection } from "./diagnosticCollection/diagnosticCollection";
+import { fixCommand } from "./commands/fixCommand";
 
 /**
  * Activates the extension.
@@ -14,16 +15,17 @@ export function activate(context: vscode.ExtensionContext) {
 
   // 2. Register the command: GrammarChecker.check to check the grammar when the user runs the command.
   context.subscriptions.push(checkCommand);
+  context.subscriptions.push(fixCommand);
 
   // 3. Used to display the details of the error when there is an error and hover over the error.
   context.subscriptions.push(
-    vscode.languages.registerHoverProvider('typescript', new HoverProvider())
+    vscode.languages.registerHoverProvider("typescript", new HoverProvider())
   );
 
   // 3. Provide the code actions to fix the error.
   context.subscriptions.push(
     vscode.languages.registerCodeActionsProvider(
-      { scheme: 'file', language: 'typescript' },
+      { scheme: "file", language: "typescript" },
       new CodeActionProvider(),
       {
         providedCodeActionKinds: CodeActionProvider.providedCodeActionKinds,

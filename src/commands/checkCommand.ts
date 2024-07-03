@@ -8,7 +8,9 @@ import { Comment, extractComments } from "../utils/typescriptUtil";
 import { translateEditionToRange } from "../utils/vscodeUtils";
 import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
 import { HoverInformation, setEditions } from "../store/store";
-import { diagnosticCode, diagnosticSource } from "../config/config";
+import { diagnosticSource } from "../config/config";
+import { commandValidator } from "../validators/commandValidator";
+import { generateDiagnosticCode } from "../utils/diagnasticUtil";
 
 export type CommentBindEdition = {
   comment: Comment;
@@ -22,17 +24,14 @@ export const checkCommand = vscode.commands.registerCommand(
   "GrammarChecker.check",
   async () => {
     // 1. Handling input.
-    // 1.1 Get the Comments from the TypeScript file.
-    const editor = vscode.window.activeTextEditor;
-    if (editor === null) {
-      return;
-    }
-    // 1.2 If the file is not a TypeScript file, return.
-    if (editor!.document.languageId !== "typescript") {
+    // 1.1 Validate the command.
+    const isOk = commandValidator();
+    if (!isOk) {
       return;
     }
 
-    // 1.3 Get the comments from the TypeScript file.
+    // 1.2 Get the comments from the TypeScript file.
+    const editor = vscode.window.activeTextEditor;
     const sourceText = editor!.document.getText();
     const comments = extractComments(sourceText, editor!.document);
 
@@ -68,43 +67,35 @@ export const checkCommand = vscode.commands.registerCommand(
         commentBindEdition.comment.text;
         edition.sourceCharIndex;
         commentBindEdition.comment.start;
+        const code = generateDiagnosticCode(range);
         const diagnostic = new vscode.Diagnostic(
           range,
           "Correct your spelling",
           vscode.DiagnosticSeverity.Warning
         );
         diagnostic.source = diagnosticSource;
-        diagnostic.code = diagnosticCode;
-
+        diagnostic.code = code;
+        // 2.4 Collect the diagnostics for the step #2.6.
         diagnostics.push(diagnostic);
-        diagnosticCollection.set(document.uri, diagnostics);
 
-        // 2.4 Collect the hover information.
+        // 2.5 Collect the hover information for the step #2.7.
         hoverInformationList.push({
           edition,
           comment: commentBindEdition.comment,
-          range,
+          diagnostic,
         });
       });
     });
 
-    // 2.5 Store the hover information to the store.
+    // 2.6 Update the diagnostic collection.
+    diagnosticCollection.has(document.uri) &&
+      diagnosticCollection.delete(document.uri);
+    diagnosticCollection.set(document.uri, diagnostics);
+
+    // 2.7 Store the hover information to the store.
     const fileName = editor!.document.fileName;
     setEditions(fileName, hoverInformationList);
 
     // 3. Return the result.
   }
 );
-
-// TODO: Implement logic to get all comments from the TypeScript file.
-
-// const range = new vscode.Range(start, end);
-// const diagnostic = new vscode.Diagnostic(
-//   range,
-//   "Correct your spelling",
-//   vscode.DiagnosticSeverity.Warning
-// );
-// diagnostic.source = "GrammarChecker";
-// diagnostics.push(diagnostic);
-
-// diagnosticCollection.set(document.uri, diagnostics);

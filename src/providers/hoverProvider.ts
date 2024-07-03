@@ -35,10 +35,11 @@ export class HoverProvider implements vscode.HoverProvider {
   ): vscode.ProviderResult<vscode.Hover> {
     // 1. Handling input.
     // 2. Progressing Logic.
-    const { edition, comment, range } = getEdition(
-      document.fileName,
-      position
-    )!;
+    const {
+      edition,
+      comment,
+      diagnostic: { range },
+    } = getEdition(document.fileName, position)!;
 
     // 2.1 Specify a pefect title in the panal when the diagnostic is hovered.
     let title = "";

@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { getEdition } from "../store/store";
-import { diagnosticCode } from "../config/config";
+import { fixCommandIdentifier, diagnosticSource } from "../config/config";
 
 export class CodeActionProvider implements vscode.CodeActionProvider {
   public static readonly providedCodeActionKinds = [
@@ -24,23 +24,22 @@ export class CodeActionProvider implements vscode.CodeActionProvider {
 
     // 2.2 Create the code action.
     const result = context.diagnostics
-      .filter((diagnostic) => diagnostic.code === diagnosticCode)
-      .map((diagnostic) => this.createFix(document, diagnostic, range));
+      .filter((diagnostic) => diagnostic.source === diagnosticSource)
+      .map((diagnostic) => this.fixIssueBuilder(document, diagnostic));
 
     // 3. Return result.
 
     return result;
   }
 
-  private createFix(
+  private fixIssueBuilder(
     document: vscode.TextDocument,
-    diagnostic: vscode.Diagnostic,
-    range: vscode.Range
+    diagnostic: vscode.Diagnostic
   ): vscode.CodeAction {
     // 1. Handling input.
     // 2. Processing logic.
     // 2.1 Find the hover information by the start position of the range.
-    const startPostion = range.start;
+    const startPostion = diagnostic.range.start;
     const hoverInformation = getEdition(document.fileName, startPostion);
     if (!hoverInformation) {
       throw new Error("Hover information not found.");
@@ -62,17 +61,22 @@ export class CodeActionProvider implements vscode.CodeActionProvider {
         break;
     }
 
-    const fix = new vscode.CodeAction(title, vscode.CodeActionKind.QuickFix);
-    fix.edit = new vscode.WorkspaceEdit();
-    fix.edit.replace(
-      document.uri,
-      diagnostic.range,
-      hoverInformation.edition.toWord
+    // 2.2.2 Create the code action.
+    const actionHandler = new vscode.CodeAction(
+      title,
+      vscode.CodeActionKind.QuickFix
     );
-    fix.diagnostics = [diagnostic];
-    fix.isPreferred = true;
+    actionHandler.edit = new vscode.WorkspaceEdit();
+    actionHandler.command = {
+      command: fixCommandIdentifier,
+
+      title: "Grammar Checker: Fix",
+      arguments: [document, diagnostic, hoverInformation],
+    };
+    actionHandler.diagnostics = [diagnostic];
+    actionHandler.isPreferred = true;
 
     // 3. Return result.
-    return fix;
+    return actionHandler;
   }
 }

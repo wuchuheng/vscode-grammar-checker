@@ -23,7 +23,11 @@
     "commands": [
       {
         "command": "GrammarChecker.check",
-        "title": "Grammar check"
+        "title": "Grammar checker: check"
+      },
+      {
+        "command": "GrammarChecker.fix",
+        "title": "Grammar checker: fix"
       }
     ],
     "diagnostics": {

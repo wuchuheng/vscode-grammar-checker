@@ -30,4 +30,18 @@ export const getSecretKey = (): string => {
  */
 export const diagnosticName = "GrammarChecker";
 export const diagnosticSource = diagnosticName;
-export const diagnosticCode = diagnosticName;
+
+/**
+ * The following constant is used to identify the command that will be executed when the user clicks on the code action.
+ */
+export const fixCommandIdentifier = "GrammarChecker.fix";
+
+/**
+ * The following configuration is used to limit the extension to the supported languages.
+ */
+export const supportedLanguages = [
+  "typescript",
+  "javascript",
+  "javascriptreact",
+  "typescriptreact",
+];
