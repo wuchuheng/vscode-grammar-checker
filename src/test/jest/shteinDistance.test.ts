@@ -1,10 +1,10 @@
 import { describe, test } from "@jest/globals";
-import { tokenize } from "../../utils/shteinDistance";
 import {
   convertComparedSentences,
   compareSentences,
   ChangedOperation,
-} from "./../../utils/compareSentenceUtil";
+  tokenize,
+} from "../../utils/compareSentenceUtil";
 
 describe("The test for the wordLevenshteinDistance", () => {
   test("Corrected the tracking of the comments", () => {

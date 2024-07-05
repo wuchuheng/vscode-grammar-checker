@@ -1,6 +1,6 @@
 import { Position, Range } from "vscode";
-import { EditOperation } from "./shteinDistance";
 import { Comment } from "./typescriptUtil";
+import { ChangedOperation } from "./compareSentenceUtil";
 
 /**
  * Translate the edition to the Range in the editor.
@@ -11,7 +11,7 @@ import { Comment } from "./typescriptUtil";
  */
 export const translateEditionToRange = (
   comment: Comment,
-  edition: EditOperation
+  edition: ChangedOperation
 ): Range => {
   // 1. Handling input.
   // 2. Progressing Logic.

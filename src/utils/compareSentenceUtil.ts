@@ -1,5 +1,3 @@
-import { tokenize } from "./shteinDistance";
-
 type OperationType = "insert" | "delete" | "modify";
 export interface CompareSentenceOperation {
   type: OperationType;
@@ -191,3 +189,7 @@ export const convertComparedSentences = (
   // 3. Return the result
   return result;
 };
+
+export function tokenize(sentence: string): string[] {
+  return sentence.match(/[ ]+|[^ |\n]+|[\n]+/gm) || [];
+}
