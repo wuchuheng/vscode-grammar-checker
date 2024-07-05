@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { Comment } from "./typescriptAdapter/typescriptUtil";
 export type CommentType = "single" | "track";
-export type RequestArgs = {
+export type RequestData = {
   prompt: string;
   commentType: CommentType;
   data: string;
@@ -43,8 +43,8 @@ export default interface LanguageAdapterInterface {
    * @param next
    * @returns
    */
-  beforeRequest(
-    requestArgs: RequestArgs,
-    next: (args: RequestArgs) => Promise<string>
-  ): Promise<string>;
+  middlewareHandle(args: {
+    requestArgs: RequestData;
+    next: (args: RequestData) => Promise<string>;
+  }): Promise<string>;
 }

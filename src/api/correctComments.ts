@@ -1,5 +1,4 @@
 import axios from "axios";
-import { correctCommentPrompt } from "../prompts/commentCorrectedPrompt";
 import { API_URL, getSecretKey, MODEL_ID } from "../config/config";
 import { log } from "console";
 import {
@@ -7,6 +6,7 @@ import {
   formatTrackComment,
 } from "../adapters/typescriptAdapter/typescriptUtil";
 import LogUtil from "../utils/logUtil";
+import { RequestData } from "../adapters/languageAdapter.interface";
 
 /**
  *  Correct the comments by using the AI system
@@ -14,7 +14,9 @@ import LogUtil from "../utils/logUtil";
  * @param input
  * @returns
  */
-export const correctComments = async (input: string): Promise<string> => {
+export const correctComments = async (
+  requestData: RequestData
+): Promise<string> => {
   //   return `/**
   // * This is multi-line comments
   // * There is a next line.
@@ -44,11 +46,11 @@ export const correctComments = async (input: string): Promise<string> => {
           messages: [
             {
               role: "assistant",
-              content: correctCommentPrompt,
+              content: requestData.prompt,
             },
             {
               role: "user",
-              content: input,
+              content: requestData.data,
             },
           ],
         },
@@ -90,7 +92,7 @@ export const correctComments = async (input: string): Promise<string> => {
 
   // 2.4 Remove the invalid characters from the content
   const contentList = content.split("\n");
-  const inputList = input.split("\n");
+  const inputList = requestData.data.split("\n");
   // 2.4.1 If the count of the lines in the content is not equal to the input, then throw an error
   if (contentList.length !== inputList.length) {
     throw new Error(
@@ -105,7 +107,7 @@ export const correctComments = async (input: string): Promise<string> => {
   content = formatSingleLineComment(content);
 
   // 2.7 Log.
-  LogUtil.debug(`AI input: ${input}`);
+  LogUtil.debug(`AI input: ${requestData.data}`);
   LogUtil.debug(`AI output: ${content}`);
 
   // 3. Return the result.

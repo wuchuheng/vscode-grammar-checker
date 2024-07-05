@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import LanguageAdapterInterface, {
-  RequestArgs,
+  RequestData,
 } from "../languageAdapter.interface";
 import { Comment, extractComments } from "./typescriptUtil";
 
@@ -23,10 +23,13 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     return result;
   }
 
-  beforeRequest(
-    requestArgs: RequestArgs,
-    next: (args: RequestArgs) => Promise<string>
-  ): Promise<string> {
-    throw new Error("Method not implemented.");
+  middlewareHandle({
+    requestArgs,
+    next,
+  }: {
+    requestArgs: RequestData;
+    next: (args: RequestData) => Promise<string>;
+  }): Promise<string> {
+    return next(requestArgs);
   }
 }

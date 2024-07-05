@@ -5,6 +5,7 @@ import { translateEditionToRange } from "../utils/vscodeUtils";
 import { DiagnasticStore, HoverInformation } from "../store/diagnasticStore";
 import { diagnosticSource } from "../config/config";
 import { commandValidator } from "../validators/commandValidator";
+import { correctCommentPrompt } from "../prompts/commentCorrectedPrompt";
 import {
   generateCode,
   reloadDiagnosticCollection,
@@ -15,6 +16,10 @@ import {
   convertComparedSentences,
 } from "../utils/compareSentenceUtil";
 import LanguageAdapterManager from "../adapters/languageAdapterManager";
+import {
+  CommentType,
+  RequestData,
+} from "../adapters/languageAdapter.interface";
 
 export type CommentBindEdition = {
   comment: Comment;
@@ -39,14 +44,27 @@ export const checkCommand = vscode.commands.registerCommand(
     // 2.1 Get the comments from the adapter.
     const editor = vscode.window.activeTextEditor!;
     const document = editor!.document;
-    const comments = LanguageAdapterManager.getAdapter(
-      document.languageId
-    ).extractComments(document);
-    // 2.2 Get the corrected comments.
+    const adapter = LanguageAdapterManager.getAdapter(document.languageId);
 
+    const comments = adapter.extractComments(document);
+    // 2.2 Collect the processing task for each comment to correct the comments.
     const tasks: Promise<string>[] = [];
     comments.forEach((comment) => {
-      tasks.push(correctComments(comment.text));
+      // 2.2.1 Call the request middleware of the adapter where the adapter can do something for a specific language before the request is made.
+      const commentType: CommentType =
+        comment.start.line !== comment.end.line ? "track" : "single";
+      const requestArgs: RequestData = {
+        prompt: correctCommentPrompt,
+        commentType: commentType,
+        data: comment.text,
+      };
+      const newTask = adapter.middlewareHandle({
+        requestArgs,
+        next: async (args) => correctComments(args),
+      });
+
+      // 2.2.3 Add the task to the list.
+      tasks.push(newTask);
     });
     const correctedComments = await Promise.all(tasks);
 
