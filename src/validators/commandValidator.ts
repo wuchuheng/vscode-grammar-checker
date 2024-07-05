@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { supportedLanguages } from "../config/config";
+import LanguageAdapterManager from "../adapters/languageAdapterManager";
 
 export const commandValidator = (): boolean => {
   // 1. Handling input.
@@ -10,7 +10,7 @@ export const commandValidator = (): boolean => {
     return false;
   }
   // 1.2 If the file is not supported, return false.
-  if (!supportedLanguages.includes(editor!.document.languageId)) {
+  if (!LanguageAdapterManager.has(editor!.document.languageId)) {
     // 3.2 If the file is not supported, return false.
     return false;
   }

@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
-import { Comment } from "../utils/typescriptUtil";
+import { Comment } from "../adapters/typescriptAdapter/typescriptUtil";
 import { fixCommandIdentifier } from "../config/config";
 import { DiagnasticStore, HoverInformation } from "../store/diagnasticStore";
-import { supportedLanguages } from "../config/config";
 import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
 import { reloadDiagnosticCollection } from "../utils/diagnasticUtil";
 import { ChangedOperation } from "../utils/compareSentenceUtil";
+import LanguageAdapterManager from "../adapters/languageAdapterManager";
 
 export type CommentBindEdition = {
   comment: Comment;
@@ -24,7 +24,10 @@ export const fixCommand = vscode.commands.registerCommand(
   ): void => {
     // 1. Handling input.
     // 1.1 Validate the command.
-    if (!supportedLanguages.includes(document.languageId)) {
+    const supertedLangIds = LanguageAdapterManager.getAdapter(
+      document.languageId
+    ).supertedLanguageId;
+    if (!supertedLangIds.includes(document.languageId)) {
       console.error(`The file: ${document.fileName} is not supported.`);
       return;
     }

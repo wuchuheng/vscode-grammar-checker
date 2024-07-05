@@ -1,5 +1,5 @@
 import { Position, Range } from "vscode";
-import { Comment } from "./typescriptUtil";
+import { Comment } from "../adapters/typescriptAdapter/typescriptUtil";
 import { ChangedOperation } from "./compareSentenceUtil";
 
 /**

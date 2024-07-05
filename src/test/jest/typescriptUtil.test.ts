@@ -2,7 +2,7 @@ import { describe, test } from "@jest/globals";
 import {
   formatSingleLineComment,
   formatTrackComment,
-} from "../../utils/typescriptUtil";
+} from "../../adapters/typescriptAdapter/typescriptUtil";
 
 describe("The test for Correcting the comments", () => {
   test("Corrected the tracking of the comments", async () => {

@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { correctComments } from "../api/correctComments";
-import { Comment, extractComments } from "../utils/typescriptUtil";
+import { Comment } from "../adapters/typescriptAdapter/typescriptUtil";
 import { translateEditionToRange } from "../utils/vscodeUtils";
 import { DiagnasticStore, HoverInformation } from "../store/diagnasticStore";
 import { diagnosticSource } from "../config/config";
@@ -14,6 +14,7 @@ import {
   compareSentences,
   convertComparedSentences,
 } from "../utils/compareSentenceUtil";
+import LanguageAdapterManager from "../adapters/languageAdapterManager";
 
 export type CommentBindEdition = {
   comment: Comment;
@@ -33,21 +34,23 @@ export const checkCommand = vscode.commands.registerCommand(
       return;
     }
 
-    // 1.2 Get the comments from the TypeScript file.
-    const editor = vscode.window.activeTextEditor;
-    const sourceText = editor!.document.getText();
-    const comments = extractComments(sourceText, editor!.document);
-
     // 2. Processing logic.
-    // 2.1 Get the corrected comments.
+
+    // 2.1 Get the comments from the adapter.
+    const editor = vscode.window.activeTextEditor!;
+    const document = editor!.document;
+    const comments = LanguageAdapterManager.getAdapter(
+      document.languageId
+    ).extractComments(document);
+    // 2.2 Get the corrected comments.
+
     const tasks: Promise<string>[] = [];
     comments.forEach((comment) => {
       tasks.push(correctComments(comment.text));
     });
     const correctedComments = await Promise.all(tasks);
 
-    // 2.2 Convert the corrected comments to list of deditions.
-
+    // 2.3 Convert the corrected comments to list of deditions.
     const commentBindEditions: CommentBindEdition[] = [];
     correctedComments.forEach((correctedComment, index) => {
       const comment = comments[index];
@@ -58,9 +61,8 @@ export const checkCommand = vscode.commands.registerCommand(
       commentBindEditions.push({ comment, editions });
     });
 
-    // 2.3 Add the diagnostics to the editor.
+    // 2.4 Add the diagnostics to the editor.
     const diagnostics: vscode.Diagnostic[] = [];
-    const document = editor!.document;
     const hoverInformationList: HoverInformation[] = [];
     commentBindEditions.forEach((commentBindEdition) => {
       commentBindEdition.editions.forEach((edition) => {
@@ -80,10 +82,10 @@ export const checkCommand = vscode.commands.registerCommand(
         );
         diagnostic.source = diagnosticSource;
         diagnostic.code = generateCode();
-        // 2.4 Collect the diagnostics for the step #2.6.
+        // 2.5 Collect the diagnostics for the step #2.7
         diagnostics.push(diagnostic);
 
-        // 2.5 Collect the hover information for the step #2.7.
+        // 2.6 Collect the hover information for the step #2.8
         hoverInformationList.push({
           edition,
           comment: commentBindEdition.comment,
@@ -92,14 +94,14 @@ export const checkCommand = vscode.commands.registerCommand(
       });
     });
 
-    // 2.6 Update the diagnostic collection.
+    // 2.7 Update the diagnostic collection.
     reloadDiagnosticCollection(document.uri, diagnostics);
 
-    // 2.7 Store the hover information to the store.
+    // 2.8 Store the hover information to the store.
     const fileName = editor!.document.fileName;
-    // 2.7.1 Clear the diagnostic in the store for this file.
+    // 2.8.1 Clear the diagnostic in the store for this file.
     DiagnasticStore.clear(fileName);
-    // 2.7.2 Add the diagnostic to the store.
+    // 2.8.2 Add the diagnostic to the store.
     hoverInformationList.forEach((item) => {
       DiagnasticStore.set({
         fileName,

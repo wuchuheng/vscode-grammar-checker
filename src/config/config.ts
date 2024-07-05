@@ -1,4 +1,6 @@
 import "dotenv/config";
+import LanguageAdapterInterface from "../adapters/languageAdapter.interface";
+import TypescriptAdapter from "../adapters/typescriptAdapter/typescriptAdapter";
 
 // The endpoint url for accessing the API of the language model.
 export const API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
@@ -37,11 +39,8 @@ export const diagnosticSource = diagnosticName;
 export const fixCommandIdentifier = "GrammarChecker.fix";
 
 /**
- * The following configuration is used to limit the extension to the supported languages.
+ *
  */
-export const supportedLanguages = [
-  "typescript",
-  "javascript",
-  "javascriptreact",
-  "typescriptreact",
+export const adapterList: LanguageAdapterInterface[] = [
+  new TypescriptAdapter(),
 ];

@@ -5,7 +5,7 @@ import { log } from "console";
 import {
   formatSingleLineComment,
   formatTrackComment,
-} from "../utils/typescriptUtil";
+} from "../adapters/typescriptAdapter/typescriptUtil";
 import LogUtil from "../utils/logUtil";
 
 /**
