@@ -73,8 +73,8 @@ export class HoverProvider implements vscode.HoverProvider {
 
     // 2.2 Create a detailed message for the hover.
     let message = comment.text;
-    const startPart = message.substring(0, edition.sourceCharIndex);
-    const endPart = message.substring(edition.sourceCharToIndex);
+    const startPart = message.substring(0, edition.chartIndex);
+    const endPart = message.substring(edition.toChartIndex);
     const toWord = escapeMarkdown(edition.toWord);
     const fromWord = escapeMarkdown(edition.fromWord);
     const modifiedWord = `<span style="color:#F00;">**${toWord}**</span>`;

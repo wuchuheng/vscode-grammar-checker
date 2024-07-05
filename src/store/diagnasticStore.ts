@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
-import { EditOperation } from "../utils/shteinDistance";
 import { Comment } from "../utils/typescriptUtil";
+import { ChangedOperation } from "../utils/compareSentenceUtil";
 
 export type HoverInformation = {
-  edition: EditOperation;
+  edition: ChangedOperation;
   comment: Comment;
   diagnostic: vscode.Diagnostic;
 };

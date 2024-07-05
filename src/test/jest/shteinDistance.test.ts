@@ -1,10 +1,10 @@
 import { describe, test } from "@jest/globals";
+import { tokenize } from "../../utils/shteinDistance";
 import {
-  IndexMapToken,
-  indexMapToken,
-  tokenize,
-  wordLevenshteinDistance,
-} from "../../utils/shteinDistance";
+  convertComparedSentences,
+  compareSentences,
+  ChangedOperation,
+} from "./../../utils/compareSentenceUtil";
 
 describe("The test for the wordLevenshteinDistance", () => {
   test("Corrected the tracking of the comments", () => {
@@ -13,27 +13,27 @@ describe("The test for the wordLevenshteinDistance", () => {
       source: "There are an dog",
       target: "There is a dog",
     };
-    let result = wordLevenshteinDistance(testItem.source, testItem.target);
-    expect(result).toEqual([
+    const editions = compareSentences(testItem.source, testItem.target);
+    let result = convertComparedSentences(testItem.source, editions);
+
+    const expectedValue: ChangedOperation[] = [
       {
         type: "modify",
-        sourceCharIndex: 6,
-        sourceCharToIndex: 9,
-        targetCharIndex: 6,
-        targetCharToIndex: 8,
+        chartIndex: 6,
+        toChartIndex: 9,
         fromWord: "are",
         toWord: "is",
       },
       {
         type: "modify",
-        sourceCharIndex: 10,
-        sourceCharToIndex: 12,
-        targetCharIndex: 9,
-        targetCharToIndex: 10,
+        chartIndex: 10,
+        toChartIndex: 12,
         fromWord: "an",
         toWord: "a",
       },
-    ]);
+    ];
+
+    expect(result).toEqual(expectedValue);
   });
 
   test("Corrected the tracking of the comments #2", () => {
@@ -41,50 +41,54 @@ describe("The test for the wordLevenshteinDistance", () => {
       source: "/ comment1: helo",
       target: "// comment1: hello",
     };
-    const result = wordLevenshteinDistance(testItem.source, testItem.target);
-    expect(result).toEqual([
+
+    const editions = compareSentences(testItem.source, testItem.target);
+    let result = convertComparedSentences(testItem.source, editions);
+    const expectedValue: ChangedOperation[] = [
       {
         type: "modify",
-        sourceCharIndex: 0,
-        sourceCharToIndex: 1,
-        targetCharIndex: 0,
-        targetCharToIndex: 2,
+        chartIndex: 0,
+        toChartIndex: 1,
         fromWord: "/",
         toWord: "//",
       },
       {
         type: "modify",
-        sourceCharIndex: 12,
-        sourceCharToIndex: 16,
-        targetCharIndex: 13,
-        targetCharToIndex: 18,
+        chartIndex: 12,
+        toChartIndex: 16,
         fromWord: "helo",
         toWord: "hello",
       },
-    ]);
+    ];
+
+    expect(result).toEqual(expectedValue);
   });
 
   test("Corrected the tracking of the comments #3", () => {
     // Inserted test case
     const testItem = { source: "There a dog", target: "There is a dog" };
-    const result = wordLevenshteinDistance(testItem.source, testItem.target);
-    expect(result).toEqual([
+
+    const editions = compareSentences(testItem.source, testItem.target);
+    let result = convertComparedSentences(testItem.source, editions);
+    const expectedValue: ChangedOperation[] = [
       {
         type: "insert",
-        sourceCharIndex: 5,
-        sourceCharToIndex: 5,
-        targetCharIndex: 5,
-        targetCharToIndex: 8,
+        chartIndex: 5,
+        toChartIndex: 5,
         fromWord: "",
         toWord: " is",
       },
-    ]);
+    ];
+
+    expect(result).toEqual(expectedValue);
   });
 
   test("Corrected the tracking of the comments #4", () => {
     // Nothing to change test case
     const testItem = { source: "There is a dog", target: "There is a dog" };
-    const result = wordLevenshteinDistance(testItem.source, testItem.target);
+    const editions = compareSentences(testItem.source, testItem.target);
+    let result = convertComparedSentences(testItem.source, editions);
+
     expect(result).toEqual([]);
   });
 
@@ -92,53 +96,51 @@ describe("The test for the wordLevenshteinDistance", () => {
     // const testItem = { source: "There are a dogs", target: "There is dog" };
     // const testItem = { source: "There are a dogs", target: "There is dog" };
     const testItem = { source: "There are a dogs", target: "There is dog" };
-    const result = wordLevenshteinDistance(testItem.source, testItem.target);
-    expect(result).toEqual([
-      {
-        type: "modify",
-        sourceCharIndex: 6,
-        sourceCharToIndex: 9,
-        targetCharIndex: 6,
-        targetCharToIndex: 8,
-        fromWord: "are",
-        toWord: "is",
-      },
-      {
-        type: "modify",
-        sourceCharIndex: 10,
-        sourceCharToIndex: 11,
-        targetCharIndex: 9,
-        targetCharToIndex: 12,
-        fromWord: "a",
-        toWord: "dog",
-      },
+    const editions = compareSentences(testItem.source, testItem.target);
+    let result = convertComparedSentences(testItem.source, editions);
+    const expectedValue: ChangedOperation[] = [
       {
         type: "delete",
-        sourceCharIndex: 11,
-        sourceCharToIndex: 16,
-        targetCharIndex: 12,
-        targetCharToIndex: 12,
-        fromWord: " dogs",
+        fromWord: " are",
         toWord: "",
+        chartIndex: 5,
+        toChartIndex: 9,
       },
-    ]);
+      {
+        type: "modify",
+        fromWord: "a",
+        toWord: "is",
+        chartIndex: 10,
+        toChartIndex: 11,
+      },
+      {
+        type: "modify",
+        fromWord: "dogs",
+        toWord: "dog",
+        chartIndex: 12,
+        toChartIndex: 16,
+      },
+    ];
+
+    expect(result).toEqual(expectedValue);
   });
 
   test("Corrected the tracking of the comments #6", () => {
     // Test the deleted test case
     const testItem = { source: "There   a is a dog", target: "There is a dog" }; // Deleted test case
-    const result = wordLevenshteinDistance(testItem.source, testItem.target);
-    expect(result).toEqual([
+    const editions = compareSentences(testItem.source, testItem.target);
+    let result = convertComparedSentences(testItem.source, editions);
+    const expectedValue: ChangedOperation[] = [
       {
         type: "delete",
-        sourceCharIndex: 5,
-        sourceCharToIndex: 9,
-        targetCharIndex: 5,
-        targetCharToIndex: 5,
+        chartIndex: 5,
+        toChartIndex: 9,
         fromWord: "   a",
         toWord: "",
       },
-    ]);
+    ];
+
+    expect(result).toEqual(expectedValue);
   });
 
   test("Test function `tokenize`", () => {
@@ -151,29 +153,5 @@ describe("The test for the wordLevenshteinDistance", () => {
     const result2 = tokenize(testItem2);
     const expected2 = ["There", "    ", "are", " ", "a", "        ", "dogs"];
     expect(result2).toEqual(expected2);
-  });
-
-  test("Test function `indexMapToken`", () => {
-    const testItem = "There are a dogs";
-    const result: IndexMapToken = indexMapToken(testItem);
-    // Create map like the following:
-    // Map(7) {
-    //   0 => { start: 0, end: 5, length: 5 },
-    //   1 => { start: 5, end: 6, length: 1 },
-    //   2 => { start: 6, end: 9, length: 3 },
-    //   3 => { start: 9, end: 10, length: 1 },
-    //   4 => { start: 10, end: 11, length: 1 },
-    //   5 => { start: 11, end: 12, length: 1 },
-    //   6 => { start: 12, end: 16, length: 4 }
-    // }
-    const expected: IndexMapToken = new Map();
-    expected.set(0, { start: 0, end: 5, length: 5 });
-    expected.set(1, { start: 5, end: 6, length: 1 });
-    expected.set(2, { start: 6, end: 9, length: 3 });
-    expected.set(3, { start: 9, end: 10, length: 1 });
-    expected.set(4, { start: 10, end: 11, length: 1 });
-    expected.set(5, { start: 11, end: 12, length: 1 });
-    expected.set(6, { start: 12, end: 16, length: 4 });
-    expect(result).toEqual(expected);
   });
 });

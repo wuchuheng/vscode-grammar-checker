@@ -1,12 +1,7 @@
 import * as vscode from "vscode";
 import { correctComments } from "../api/correctComments";
-import {
-  EditOperation,
-  wordLevenshteinDistance,
-} from "../utils/shteinDistance";
 import { Comment, extractComments } from "../utils/typescriptUtil";
 import { translateEditionToRange } from "../utils/vscodeUtils";
-import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
 import { DiagnasticStore, HoverInformation } from "../store/diagnasticStore";
 import { diagnosticSource } from "../config/config";
 import { commandValidator } from "../validators/commandValidator";
@@ -14,10 +9,15 @@ import {
   generateCode,
   reloadDiagnosticCollection,
 } from "../utils/diagnasticUtil";
+import {
+  ChangedOperation,
+  compareSentences,
+  convertComparedSentences,
+} from "../utils/compareSentenceUtil";
 
 export type CommentBindEdition = {
   comment: Comment;
-  editions: EditOperation[];
+  editions: ChangedOperation[];
 };
 
 /**
@@ -51,7 +51,10 @@ export const checkCommand = vscode.commands.registerCommand(
     const commentBindEditions: CommentBindEdition[] = [];
     correctedComments.forEach((correctedComment, index) => {
       const comment = comments[index];
-      const editions = wordLevenshteinDistance(comment.text, correctedComment);
+
+      const wordEdits = compareSentences(comment.text, correctedComment);
+      const editions = convertComparedSentences(comment.text, wordEdits);
+
       commentBindEditions.push({ comment, editions });
     });
 
@@ -68,7 +71,7 @@ export const checkCommand = vscode.commands.registerCommand(
 
         // 2.3.2 Create the diagnostic.
         commentBindEdition.comment.text;
-        edition.sourceCharIndex;
+        edition.chartIndex;
         commentBindEdition.comment.start;
         const diagnostic = new vscode.Diagnostic(
           range,

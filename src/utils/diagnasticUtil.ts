@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
-import { declarations } from "../../dist/extension";
 
 /**
  * Generate the diagnostic code.

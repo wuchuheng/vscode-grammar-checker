@@ -20,7 +20,7 @@ export const translateEditionToRange = (
   let end: Position;
 
   // 2.1.1 Get the position from the multi-line comment.
-  let lines = comment.text.substring(0, edition.sourceCharToIndex).split("\n");
+  let lines = comment.text.substring(0, edition.toChartIndex).split("\n");
   const isMultiLine = lines.length > 1;
   if (isMultiLine) {
     let accessedChartCount = 0;
@@ -31,18 +31,18 @@ export const translateEditionToRange = (
     for (const line of lines) {
       // 2.1.2 Get the start position of the edition.
       if (!isGetStartPostion) {
-        if (accessedChartCount + line.length >= edition.sourceCharIndex) {
+        if (accessedChartCount + line.length >= edition.chartIndex) {
           const lineNumber = comment.start.line + lineCount;
-          const character = edition.sourceCharIndex - accessedChartCount;
+          const character = edition.chartIndex - accessedChartCount;
           start = new Position(lineNumber, character);
           isGetStartPostion = true;
         }
       }
       // 2.1.3 Get the end position of the edition.
       if (!isGetEndPostion) {
-        if (accessedChartCount + line.length >= edition.sourceCharToIndex) {
+        if (accessedChartCount + line.length >= edition.toChartIndex) {
           const lineNumber = comment.start.line + lineCount;
-          const character = edition.sourceCharToIndex - accessedChartCount;
+          const character = edition.toChartIndex - accessedChartCount;
           end = new Position(lineNumber, character);
           isGetEndPostion = true;
         }
@@ -61,10 +61,10 @@ export const translateEditionToRange = (
     // 2.2 Get the position from the single line comment.
     const lineNumber = comment.start.line;
     // 2.2.1 Get the start position of the edition.
-    start = new Position(lineNumber, edition.sourceCharIndex);
+    start = new Position(lineNumber, edition.chartIndex);
 
     // 2.2.2 Get the end position of the edition.
-    end = new Position(lineNumber, edition.sourceCharToIndex);
+    end = new Position(lineNumber, edition.toChartIndex);
   }
 
   // 3. Return result.

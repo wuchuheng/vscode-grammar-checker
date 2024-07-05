@@ -1,15 +1,15 @@
 import * as vscode from "vscode";
-import { EditOperation } from "../utils/shteinDistance";
 import { Comment } from "../utils/typescriptUtil";
 import { fixCommandIdentifier } from "../config/config";
 import { DiagnasticStore, HoverInformation } from "../store/diagnasticStore";
 import { supportedLanguages } from "../config/config";
 import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
 import { reloadDiagnosticCollection } from "../utils/diagnasticUtil";
+import { ChangedOperation } from "../utils/compareSentenceUtil";
 
 export type CommentBindEdition = {
   comment: Comment;
-  editions: EditOperation[];
+  editions: ChangedOperation[];
 };
 
 /**
