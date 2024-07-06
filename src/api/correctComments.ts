@@ -1,10 +1,6 @@
 import axios from "axios";
 import { API_URL, getSecretKey, MODEL_ID } from "../config/config";
 import { log } from "console";
-import {
-  formatSingleLineComment,
-  formatTrackComment,
-} from "../adapters/typescriptAdapter/typescriptUtil";
 import LogUtil from "../utils/logUtil";
 import { RequestData } from "../adapters/languageAdapter.interface";
 
@@ -99,12 +95,6 @@ export const correctComments = async (
       "The count of the lines in the content is not equal to the input"
     );
   }
-
-  // 2.5 Format the track comment.
-  content = formatTrackComment(content);
-
-  // 2.6 Format the single line comment.
-  content = formatSingleLineComment(content);
 
   // 2.7 Log.
   LogUtil.debug(`AI input: ${requestData.data}`);
