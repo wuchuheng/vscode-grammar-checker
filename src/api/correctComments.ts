@@ -72,29 +72,27 @@ ${requestData.data}
     }
   }
 
-  // 2.3 Remove the wrapper of the content in markdown format
+  // 2.3 Log.
+  LogUtil.debug(`AI input: ${requestData.data}`);
+  LogUtil.debug(`AI output: ${content}`);
+
+  // 2.4 Remove the wrapper of the content in markdown format
   content = content.trim();
-  // 2.3.1 If the content start with '```', remove the wrapper
+  // 2.4.1 If the content start with '```', remove the wrapper
   if (content.startsWith("```")) {
-    // regex pattern to remove the wrapper
-    const regexPattern = /(```\w{0}).*/;
-    const match = content.match(regexPattern);
-    const markdownStr: string = match != null && match![0] ? match![0]! : "";
-    if (markdownStr.length > 0) {
-      content = content.substring(markdownStr.length);
-    }
+    content = content.substring(3);
   }
 
-  // 2.3.2 If the content end with '```', remove the wrapper
+  // 2.4.2 If the content end with '```', remove the wrapper
   content = content.endsWith("```")
     ? content.substring(0, content.length - 3)
     : content;
 
-  // 2.4 Remove the invalid characters from the content
+  // 2.5 Remove the invalid characters from the content
   content = content.trim();
   const contentList = content.trim().split("\n");
   const inputList = requestData.data.split("\n");
-  // 2.4.1 If the count of the lines in the content is not equal to the input, then throw an error
+  // 2.5.1 If the count of the lines in the content is not equal to the input, then throw an error
   if (contentList.length !== inputList.length) {
     LogUtil.error(`
       Input: ${inputList.join("\n")}
@@ -108,10 +106,6 @@ ${requestData.data}
       );
     }
   }
-
-  // 2.7 Log.
-  LogUtil.debug(`AI input: ${requestData.data}`);
-  LogUtil.debug(`AI output: ${content}`);
 
   // 3. Return the result.
   return content;

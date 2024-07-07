@@ -41,9 +41,9 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     // 1. Handling input.
     // 2. Processing logic.
     let lines = comment.split("\n");
-    // 2.1 Build the edits
+    // 2.1 Build the edit.
     const edits: RemoveCommentFormatResultType[] = lines.map((line) => {
-      // 2.1.1 Extract the spaces and the formated format character before the comment comment.
+      // 2.1.1 Extract the spaces and the formatted format character before the comment.
       const regexPattern = /^\s*(:?\*\/\s*|\/\*+\s?|\*?\s*(\d\.*)*\s*)/gm;
       const spacesBeforeComment = line.match(regexPattern);
       const prefix: string = spacesBeforeComment ? spacesBeforeComment[0] : "";
@@ -61,7 +61,7 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     // 1. Handling input.
     // 2. Processing logic.
 
-    // 2.1.1 Extract the spaces and the formated format character before the comment comment.
+    // 2.1.1 Extract the spaces and formatted format characters before the comment.
     const regexPattern = /^\s*\/\/+\s*(\d\.*)*\s*/;
     const spacesBeforeComment = line.match(regexPattern);
     const prefix: string = spacesBeforeComment ? spacesBeforeComment[0] : "";
@@ -96,7 +96,7 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     requestArgs: RequestData;
     next: (args: RequestData) => Promise<string>;
   }): Promise<string> {
-    // 1. Handing input.
+    // 1. Handing in the input.
     // 2. Processing logic.
     // 2.1 Remove the track comment format.
     const unformatComments =
@@ -111,10 +111,10 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
         removedEmptyLineIndexList.push(i);
         return false;
       }
-      return true;
+       return true;
     });
 
-    // 2.3 Send the request to the OpenAI API, and get the response from the API.
+    // 2.3 Send the request to the OpenAI API and get the response from the API.
     const data: string = lines.map((line) => line.line).join("\n");
     const args: RequestData = {
       ...requestArgs,
@@ -123,7 +123,7 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     };
     let response = await next(args);
 
-    // 2.4 Remove the prefix of the comment. like: `//` and `*` before the comment, because the character is removed before sending the request, and if the response contains the character, the character should be removed.
+    // 2.4 Remove the prefix of the comment, like: `//` and `*` before the comment, because the character is removed before sending the request, and if the response contains the character, the character should be removed.
     const removedResult =
       requestArgs.commentType === "track"
         ? this.removeTrackLineCommentFormat(response)
