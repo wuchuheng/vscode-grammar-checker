@@ -61,10 +61,11 @@ export const translateEditionToRange = (
     // 2.2 Get the position from the single line comment.
     const lineNumber = comment.start.line;
     // 2.2.1 Get the start position of the edition.
-    start = new Position(lineNumber, edition.chartIndex);
+    const prefixCharacter = comment.start.character;
+    start = new Position(lineNumber, +edition.chartIndex + prefixCharacter);
 
     // 2.2.2 Get the end position of the edition.
-    end = new Position(lineNumber, edition.toChartIndex);
+    end = new Position(lineNumber, prefixCharacter + edition.toChartIndex);
   }
 
   // 3. Return result.

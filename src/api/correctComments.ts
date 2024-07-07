@@ -4,6 +4,8 @@ import { log } from "console";
 import LogUtil from "../utils/logUtil";
 import { RequestData } from "../adapters/languageAdapter.interface";
 
+const maximumRetryCount = 3;
+
 /**
  *  Correct the comments by using the AI system
  *
@@ -11,9 +13,9 @@ import { RequestData } from "../adapters/languageAdapter.interface";
  * @returns
  */
 export const correctComments = async (
-  requestData: RequestData
+  requestData: RequestData,
+  tryCount: number = 0
 ): Promise<string> => {
-  //   return `/**
   // * This is multi-line comments
   // * There is a next line.
   // * There are next lines.
@@ -46,7 +48,9 @@ export const correctComments = async (
             },
             {
               role: "user",
-              content: requestData.data,
+              content: `\`\`\`
+${requestData.data}
+\`\`\``,
             },
           ],
         },
@@ -87,13 +91,22 @@ export const correctComments = async (
     : content;
 
   // 2.4 Remove the invalid characters from the content
-  const contentList = content.split("\n");
+  content = content.trim();
+  const contentList = content.trim().split("\n");
   const inputList = requestData.data.split("\n");
   // 2.4.1 If the count of the lines in the content is not equal to the input, then throw an error
   if (contentList.length !== inputList.length) {
-    throw new Error(
-      "The count of the lines in the content is not equal to the input"
-    );
+    LogUtil.error(`
+      Input: ${inputList.join("\n")}
+      Output: ${contentList.join("\n")}
+    `);
+    if (tryCount < maximumRetryCount) {
+      return await correctComments(requestData, tryCount + 1);
+    } else {
+      throw new Error(
+        "The count of the lines in the content is not equal to the input"
+      );
+    }
   }
 
   // 2.7 Log.
