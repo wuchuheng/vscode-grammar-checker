@@ -111,7 +111,7 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
       }
     });
 
-    // 2.3 Send the request to the OpenAI API.
+    // 2.3 Send the request to the OpenAI API, and get the response from the API.
     const data: string = lines.map((line) => line.line).join("\n");
     const args: RequestData = {
       ...requestArgs,
@@ -119,6 +119,13 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
       data,
     };
     let response = await next(args);
+
+    // 2.4 Remove the prefix of the comment. like: `//` and `*` before the comment, because the character is removed before sending the request, and if the response contains the character, the character should be removed.
+    const removedResult =
+      requestArgs.commentType === "track"
+        ? this.removeTrackLineCommentFormat(response)
+        : this.removeSingleLineCommentFormat(response);
+    response = removedResult.map((comment) => comment.line).join("\n");
 
     // 2.4 Restore the empty lines.
     if (topCount > 0) {
