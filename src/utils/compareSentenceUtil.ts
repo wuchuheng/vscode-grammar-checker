@@ -157,7 +157,7 @@ export const convertComparedSentences = (
     // 2.2.1 Create a new converted item.
     const edit = inputOperations[index];
     const { start, end } = indexMapToken.get(edit.index)!;
-    let convertedItem: ChangedOperation = {
+    let currentItem: ChangedOperation = {
       type: edit.type,
       fromWord: edit.fromWord,
       toWord: edit.toWord,
@@ -167,23 +167,38 @@ export const convertComparedSentences = (
 
     // 2.2.2 If the previouse item is exist and is nearby the current item with the condition that the toChartIndex of the previous item is equal to the chartIndex of the current item. and then merge the two items.
     const previousItem = result[result.length - 1];
-    if (previousItem?.toChartIndex === convertedItem.chartIndex) {
+    const isNearby = previousItem?.toChartIndex === currentItem.chartIndex;
+    if (isNearby) {
       // 2.2.3 Remove the previous item in the result.
       result.pop();
       // 2.2.4 If the type is the same, merge the two items.
-      const isSameType = previousItem.type === convertedItem.type;
+      const isSameType = previousItem.type === currentItem.type;
       const editType = isSameType ? previousItem.type : "modify";
-      convertedItem = {
+      currentItem = {
         ...previousItem,
         type: editType,
-        toWord: previousItem.toWord + convertedItem.toWord,
-        fromWord: previousItem.fromWord + convertedItem.fromWord,
-        toChartIndex: convertedItem.toChartIndex,
+        toWord: previousItem.toWord + currentItem.toWord,
+        fromWord: previousItem.fromWord + currentItem.fromWord,
+        toChartIndex: currentItem.toChartIndex,
       };
     }
 
-    // 2.3 Push the converted item to the result.
-    result.push(convertedItem);
+    // 2.3 If the previous item is exist and there is a gap between the previous item and the current item, and then merge the two items.
+    if (previousItem?.toChartIndex + 1 === currentItem.chartIndex) {
+      result.pop();
+      const isSameType = previousItem.type === currentItem.type;
+      const editType = isSameType ? previousItem.type : "modify";
+      currentItem = {
+        ...previousItem,
+        type: editType,
+        toWord: previousItem.toWord + " " + currentItem.toWord,
+        fromWord: previousItem.fromWord + " " + currentItem.fromWord,
+        toChartIndex: currentItem.toChartIndex,
+      };
+    }
+
+    // 2.4 Push the converted item to the result.
+    result.push(currentItem);
   }
 
   // 3. Return the result
