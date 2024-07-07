@@ -86,29 +86,14 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
         ? this.removeTrackLineCommentFormat(requestArgs.data)
         : this.removeSingleLineCommentFormat(requestArgs.data);
 
-    // 2.2 Remove the empty lines and register the top count and bottom count of the lines.
-    let topCount = 0;
-    let meetedTopContentOnce = false;
-    let bottomCount = 0;
-
-    const lines = unformatComments.filter((comment) => {
-      // 2.2.1 Count the top empty lines.
-      if (comment.line.trim() !== "" && !meetedTopContentOnce) {
-        meetedTopContentOnce = true;
-        return true;
-      }
-      if (!meetedTopContentOnce) {
-        topCount++;
+    // 2.2 Remove the empty lines.
+    const removedEmptyLineIndexList: number[] = [];
+    const lines = unformatComments.filter((comment, i) => {
+      if (comment.line.trim() === "") {
+        removedEmptyLineIndexList.push(i);
         return false;
       }
-      // 2.2.2 Count the bottom empty lines.
-      if (comment.line.trim() !== "") {
-        bottomCount = 0;
-        return true;
-      } else {
-        bottomCount++;
-        return false;
-      }
+      return true;
     });
 
     // 2.3 Send the request to the OpenAI API, and get the response from the API.
@@ -128,13 +113,10 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     response = removedResult.map((comment) => comment.line).join("\n");
 
     // 2.4 Restore the empty lines.
-    if (topCount > 0) {
-      response = "\n".repeat(topCount) + response;
-    }
-    if (bottomCount > 0) {
-      response = response + "\n".repeat(bottomCount);
-    }
     const responseLines = response.split("\n");
+    removedEmptyLineIndexList.forEach((index) => {
+      responseLines.splice(index, 0, "");
+    });
 
     // 2.5 Restore the removed format for each line.
     unformatComments.forEach((comment, index) => {

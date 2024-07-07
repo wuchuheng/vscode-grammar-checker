@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@wuchuhengtools/helper':
+        specifier: ^1.0.18
+        version: 1.0.18
       axios:
         specifier: ^1.7.2
         version: 1.7.2
@@ -627,6 +630,9 @@ packages:
     peerDependenciesMeta:
       webpack-dev-server:
         optional: true
+
+  '@wuchuhengtools/helper@1.0.18':
+    resolution: {integrity: sha512-t25xZN34HJawMpk6+1MiErO6XlMhFJM1xHQpIQVuhaRtNTTWyHjgCWYyzbqC/qasXKTwIZa2/mogiww2Egtu2Q==}
 
   '@xtuc/ieee754@1.2.0':
     resolution: {integrity: sha512-DX8nKgqcGwsc0eJSqYt5lwP4DH5FlHnmuWWBRy7X0NcaGR0ZtuyeESgMwTYVEtxmsNGY+qit4QYT/MIYTOTPeA==}
@@ -2209,6 +2215,10 @@ packages:
     resolution: {integrity: sha512-t0rzBq87m3fVcduHDUFhKmyyX+9eo6WQjZvf51Ea/M0Q7+T374Jp1aUiyUl0GKxp8M/OETVHSDvmkyPgvX+X2w==}
     engines: {node: '>=10'}
 
+  types@0.1.1:
+    resolution: {integrity: sha512-JuntZtJj4MKLE9x/XBs7IjsznYhzETwr34pw3XJTKvgYtAMdeMG+o8x8U85E5Lm6eCPa1DdOdGVsHMwq4ZnZAg==}
+    engines: {node: '>= 0.6.0'}
+
   typescript@5.4.5:
     resolution: {integrity: sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==}
     engines: {node: '>=14.17'}
@@ -3140,6 +3150,10 @@ snapshots:
     dependencies:
       webpack: 5.92.0(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack@5.92.0)
+
+  '@wuchuhengtools/helper@1.0.18':
+    dependencies:
+      types: 0.1.1
 
   '@xtuc/ieee754@1.2.0': {}
 
@@ -4873,6 +4887,8 @@ snapshots:
   type-fest@0.20.2: {}
 
   type-fest@0.21.3: {}
+
+  types@0.1.1: {}
 
   typescript@5.4.5: {}
 
