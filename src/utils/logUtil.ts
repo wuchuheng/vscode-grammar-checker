@@ -10,11 +10,13 @@ enum LogLevel {
 export default class LogUtil {
   // Method to log messages with a specific log level
   static log(level: LogLevel, messages: string | string[]): void {
-    const timestamp = new Date().toISOString();
+    const time = new Date();
+    // Date time format like: 2021-09-01 12:00:00
+    const datetimeFormat = `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`;
     const formattedMessages = Array.isArray(messages)
       ? messages.join("\n")
       : messages;
-    console.log(`[${timestamp}] [${level}]: ${formattedMessages}`);
+    console.log(`[${datetimeFormat}] [${level}]: ${formattedMessages}`);
   }
 
   // Convenience methods for each log level

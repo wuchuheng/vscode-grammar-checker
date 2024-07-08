@@ -5,6 +5,9 @@ import { checkCommand } from "./commands/checkCommand";
 import { diagnosticCollection } from "./diagnosticCollection/diagnosticCollection";
 import { fixCommand } from "./commands/fixCommand";
 import LanguageAdapterManager from "./adapters/languageAdapterManager";
+import LogUtil from "./utils/logUtil";
+import { debounce } from "@wuchuhengtools/helper";
+import { onDidChangeTextDocumentProvider } from "./providers/onDidChangeTextDocumentProvider";
 
 /**
  * Activates the extension.
@@ -24,6 +27,27 @@ export function activate(context: vscode.ExtensionContext) {
   // 4. Used to display the details of the error when there is an error and hover over the error.
   context.subscriptions.push(
     vscode.languages.registerHoverProvider("typescript", new HoverProvider())
+  );
+  // 4.1 Update the diagnostic store when the document is changed.
+  vscode.workspace.onDidChangeTextDocument(
+    onDidChangeTextDocumentProvider
+    // const { fileName } = event.document;
+    // const newHoverInformationList = diagnostics.map((diagnostic) => {
+    //   const hoverInformation = DiagnasticStore.get({
+    //     fileName,
+    //     id: diagnostic.code as number,
+    //   });
+    //   hoverInformation.diagnostic = diagnostic;
+    //   return hoverInformation;
+    // });
+    // DiagnasticStore.clear(event.document.fileName);
+    // newHoverInformationList.forEach((item) => {
+    //   DiagnasticStore.set({
+    //     fileName,
+    //     id: item.diagnostic.code as number,
+    //     value: item,
+    //   });
+    // });
   );
 
   // 5. Provide the code actions to fix the error.
