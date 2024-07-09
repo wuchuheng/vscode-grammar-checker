@@ -4,37 +4,89 @@ import LogUtil from "../utils/logUtil";
 import { DiagnasticStore } from "../store/diagnasticStore";
 import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
 
+/**
+ * Get the changed type of the text document content change event.
+ * @param change
+ * @returns
+ */
+const getChangedType = (
+  change: vscode.TextDocumentContentChangeEvent
+): "insert" | "delete" | "replace" => {
+  // 1. Handling input.
+  // 2. Process logic.
+  // 2.1 If the length of the text is empty, but the range length is not empty, return "delete".
+  if (change.text === "" && change.rangeLength > 0) {
+    return "delete";
+  }
+
+  // 2.2 If the length of the text is not empty, but the range length is empty, return "insert".
+  if (change.text !== "" && change.rangeLength === 0) {
+    return "insert";
+  }
+
+  // 2.3 If the length of the text is not empty, and the range length is not empty, return "replace".
+  if (change.text !== "" && change.rangeLength > 0) {
+    return "replace";
+  }
+
+  // 3. Return result.
+  throw new Error("Invalid change type");
+};
+
 const getAdjustedDiagnostics = (
   event: vscode.TextDocumentChangeEvent
 ): vscode.Diagnostic[] => {
   // 1. Handling input.
-  // 2. Process logic.
-  // 2.1 Adjust diagnostics based on document changes
+  // 2. Process logic: Adjust diagnostics based on document changes
   const changes = event.contentChanges;
-
-  let diagnostics = vscode.languages.getDiagnostics(event.document.uri) || [];
-  diagnostics = diagnostics.map((diagnostic) => {
+  const diagnostics = diagnosticCollection.get(event.document.uri) || [];
+  const newDiagnostics: vscode.Diagnostic[] = diagnostics.map((diagnostic) => {
     for (const change of changes) {
       const range = change.range;
+      // 2.1 If the diagnostic is placed before the change, no need to adjust.
       if (range.start.isAfter(diagnostic.range.end)) {
-        // Change after the diagnostic range, no need to adjust
         continue;
       }
+
+      // 2.2 If the diagnostic is placed after the change, adjust the start and end.
       const text = change.text;
+      const changedTextLines = text.split("\n");
+      let lastChangedTextLine = changedTextLines[changedTextLines.length - 1];
+      // 2.2.1 Get the last text line length.
+      let lastTextLineLength = 0;
+      const changedType = getChangedType(change);
+      switch (changedType) {
+        case "insert":
+          lastTextLineLength = lastChangedTextLine.length;
+          break;
+        case "delete":
+          lastTextLineLength = -change.rangeLength;
+          break;
+        case "replace":
+          lastTextLineLength = lastChangedTextLine.length - change.rangeLength;
+          break;
+      }
+
+      // 2.2.2 If the change is before the diagnostic range, adjust the start and end.
       if (range.end.isBefore(diagnostic.range.start)) {
         // Change before the diagnostic range, adjust start and end
         const lineDelta =
           text.split("\n").length - 1 - (range.end.line - range.start.line);
+        const charDelta =
+          change.range.end.line === diagnostic.range.start.line &&
+          changedType === "insert"
+            ? lastTextLineLength
+            : 0;
         diagnostic.range = new vscode.Range(
-          diagnostic.range.start.translate(lineDelta),
-          diagnostic.range.end.translate(lineDelta)
+          diagnostic.range.start.translate(lineDelta, charDelta),
+          diagnostic.range.end.translate(lineDelta, charDelta)
         );
       } else if (range.end.isEqual(diagnostic.range.start)) {
-        // Change ends at the start of the diagnostic range, adjust start
+        // 2.2.3 If the change is in the same line as the start of the diagnostic range, adjust the start.
         const lineDelta = text.split("\n").length - 1;
-        const charDelta = text.split("\n").pop()!.length;
+        const charDelta = lastTextLineLength;
         const start = diagnostic.range.start.translate(lineDelta, charDelta);
-        const end = diagnostic.range.end.translate(lineDelta);
+        const end = diagnostic.range.end.translate(lineDelta, charDelta);
         diagnostic.range = new vscode.Range(start, end);
       } else if (range.intersection(diagnostic.range)) {
         // Change intersects with the diagnostic range, adjust or invalidate diagnostic
@@ -49,7 +101,7 @@ const getAdjustedDiagnostics = (
   });
 
   // 3. Return result.
-  return diagnostics;
+  return newDiagnostics;
 };
 
 /**
@@ -122,7 +174,6 @@ export const onDidChangeTextDocumentProvider = (
 ) => {
   const debounceHandler = debounce<void>(() => {
     // 1. Handling input.
-
     // 2. Process logic.
     // 2.1 If the changes are the same, return.
     if (
@@ -153,7 +204,7 @@ startLine: ${range.start.line}, startCharacter: ${range.start.character},
 endLine: ${range.end.line}, endCharacter: ${range.end.character}`
       );
     });
-  }, 300);
+  }, 100);
 
   debounceHandler();
 };
