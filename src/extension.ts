@@ -29,26 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.languages.registerHoverProvider("typescript", new HoverProvider())
   );
   // 4.1 Update the diagnostic store when the document is changed.
-  vscode.workspace.onDidChangeTextDocument(
-    onDidChangeTextDocumentProvider
-    // const { fileName } = event.document;
-    // const newHoverInformationList = diagnostics.map((diagnostic) => {
-    //   const hoverInformation = DiagnasticStore.get({
-    //     fileName,
-    //     id: diagnostic.code as number,
-    //   });
-    //   hoverInformation.diagnostic = diagnostic;
-    //   return hoverInformation;
-    // });
-    // DiagnasticStore.clear(event.document.fileName);
-    // newHoverInformationList.forEach((item) => {
-    //   DiagnasticStore.set({
-    //     fileName,
-    //     id: item.diagnostic.code as number,
-    //     value: item,
-    //   });
-    // });
-  );
+  vscode.workspace.onDidChangeTextDocument(onDidChangeTextDocumentProvider);
 
   // 5. Provide the code actions to fix the error.
   context.subscriptions.push(
@@ -60,6 +41,14 @@ export function activate(context: vscode.ExtensionContext) {
       }
     )
   );
+
+  // 6. Execute the command `grammarChecker.check` when the file is opened.
+  vscode.workspace.onDidOpenTextDocument((document) => {
+    if (document.languageId === "plaintext") {
+      // Optionally execute the command for the currently open file on startup
+      vscode.commands.executeCommand("GrammarChecker.check");
+    }
+  });
 }
 
 export function deactivate() {}
