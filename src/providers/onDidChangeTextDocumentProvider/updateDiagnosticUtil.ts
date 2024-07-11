@@ -1,15 +1,15 @@
-import { debounce } from "@wuchuhengtools/helper";
 import * as vscode from "vscode";
-import LogUtil from "../utils/logUtil";
-import { DiagnasticStore } from "../store/diagnasticStore";
-import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
+import { DiagnasticStore } from "../../store/diagnasticStore";
+import { diagnosticCollection } from "../../diagnosticCollection/diagnosticCollection";
+import { debounce } from "@wuchuhengtools/helper";
+import LogUtil from "../../utils/logUtil";
 
 /**
  * Get the changed type of the text document content change event.
  * @param change
  * @returns
  */
-const getChangedType = (
+export const getChangedType = (
   change: vscode.TextDocumentContentChangeEvent
 ): "insert" | "delete" | "replace" => {
   // 1. Handling input.
@@ -33,7 +33,7 @@ const getChangedType = (
   throw new Error("Invalid change type");
 };
 
-const getAdjustedDiagnostics = (
+export const getAdjustedDiagnostics = (
   event: vscode.TextDocumentChangeEvent
 ): vscode.Diagnostic[] => {
   // 1. Handling input.
@@ -109,7 +109,7 @@ const getAdjustedDiagnostics = (
  * @param previouseChanges
  * @param currentChanges
  */
-const isSameChanges = (
+export const isSameChanges = (
   previouseChanges: readonly vscode.TextDocumentContentChangeEvent[],
   currentChanges: readonly vscode.TextDocumentContentChangeEvent[]
 ): boolean => {
@@ -140,7 +140,7 @@ const isSameChanges = (
 /**
  * Update the hover information with the new diagnostics.
  */
-const updateHoverInformation = (
+export const updateHoverInformation = (
   fileName: string,
   newDiagnostics: vscode.Diagnostic[]
 ): void => {
@@ -169,10 +169,8 @@ const updateHoverInformation = (
 };
 
 let previousChanges: readonly vscode.TextDocumentContentChangeEvent[] = [];
-export const onDidChangeTextDocumentProvider = (
-  event: vscode.TextDocumentChangeEvent
-) => {
-  const debounceHandler = debounce<void>(() => {
+export const updateDiagnostic = debounce<vscode.TextDocumentChangeEvent>(
+  (event) => {
     // 1. Handling input.
     // 2. Process logic.
     // 2.1 If the changes are the same, return.
@@ -204,7 +202,6 @@ startLine: ${range.start.line}, startCharacter: ${range.start.character},
 endLine: ${range.end.line}, endCharacter: ${range.end.character}`
       );
     });
-  }, 100);
-
-  debounceHandler();
-};
+  },
+  100
+);

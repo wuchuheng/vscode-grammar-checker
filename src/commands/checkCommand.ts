@@ -3,7 +3,7 @@ import { correctComments } from "../api/correctComments";
 import { Comment } from "../adapters/typescriptAdapter/typescriptUtil";
 import { translateEditionToRange } from "../utils/vscodeUtils";
 import { DiagnasticStore, HoverInformation } from "../store/diagnasticStore";
-import { diagnosticSource } from "../config/config";
+import { checkCommandIdentifier, diagnosticSource } from "../config/config";
 import { commandValidator } from "../validators/commandValidator";
 import { correctCommentPrompt } from "../prompts/commentCorrectedPrompt";
 import {
@@ -30,8 +30,8 @@ export type CommentBindEdition = {
  * Registers the "GrammarChecker.check" command.
  */
 export const checkCommand = vscode.commands.registerCommand(
-  "GrammarChecker.check",
-  async () => {
+  checkCommandIdentifier,
+  async (inputComments: Comment[] = []) => {
     // 1. Handling input.
     // 1.1 Validate the command.
     const isOk = commandValidator();
@@ -46,7 +46,10 @@ export const checkCommand = vscode.commands.registerCommand(
     const document = editor!.document;
     const adapter = LanguageAdapterManager.getAdapter(document.languageId);
 
-    const comments = adapter.extractComments(document);
+    const comments =
+      inputComments.length > 0
+        ? inputComments
+        : adapter.extractComments(document);
     // 2.2 Collect the processing task for each comment to correct the comments.
     const tasks: Promise<string>[] = [];
     comments.forEach((comment) => {

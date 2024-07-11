@@ -16,6 +16,6 @@ export const onDidChangeTextDocumentProvider = (
   // 2.2 Update the position of the diagnostic in the document after the changes.
   updateDiagnosticInCurrentCommentPosition(event);
 
-  // 2.3 Update the diagnostics for the new changes.
+  // 2.3 Update the diagnostic for the new changes
   updateDiagnostic(event);
 };

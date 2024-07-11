@@ -38,6 +38,8 @@ export const diagnosticSource = diagnosticName;
  */
 export const fixCommandIdentifier = "GrammarChecker.fix";
 
+export const checkCommandIdentifier = "GrammarChecker.check";
+
 /**
  *
  */

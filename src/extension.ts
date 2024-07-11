@@ -7,7 +7,8 @@ import { fixCommand } from "./commands/fixCommand";
 import LanguageAdapterManager from "./adapters/languageAdapterManager";
 import LogUtil from "./utils/logUtil";
 import { debounce } from "@wuchuhengtools/helper";
-import { onDidChangeTextDocumentProvider } from "./providers/onDidChangeTextDocumentProvider";
+import { onDidChangeTextDocumentProvider } from "./providers/onDidChangeTextDocumentProvider/onDidChangeTextDocumentProvider";
+import { checkCommandIdentifier } from "./config/config";
 
 /**
  * Activates the extension.
@@ -46,7 +47,7 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.workspace.onDidOpenTextDocument((document) => {
     if (document.languageId === "plaintext") {
       // Optionally execute the command for the currently open file on startup
-      vscode.commands.executeCommand("GrammarChecker.check");
+      vscode.commands.executeCommand(checkCommandIdentifier);
     }
   });
 }

@@ -6,6 +6,7 @@ import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollecti
 import { reloadDiagnosticCollection } from "../utils/diagnasticUtil";
 import { ChangedOperation } from "../utils/compareSentenceUtil";
 import LanguageAdapterManager from "../adapters/languageAdapterManager";
+import { setFlashState } from "../store/isChangeFromActionCodeStore";
 
 export type CommentBindEdition = {
   comment: Comment;
@@ -33,7 +34,9 @@ export const fixCommand = vscode.commands.registerCommand(
     }
 
     // 2. Processing logic.
-    // 2.1 Update the document content with the range.
+    // 2.1 Set the state to true. this state will be used to check if the changes are from the action code or not.
+    setFlashState(true);
+    // 2.2 Update the document content with the range.
     const replacedWord = hoverInformation.edition.toWord;
 
     const edit = new vscode.WorkspaceEdit();
@@ -41,15 +44,15 @@ export const fixCommand = vscode.commands.registerCommand(
     const { range } = inputDiagnostic;
     switch (hoverInformation.edition.type) {
       case "delete":
-        // 2.1.1 Delete the word.
+        // 2.2.1 Delete the word.
         edit.delete(document.uri, range);
         break;
       case "insert":
-        // 2.1.2 Insert the word.
+        // 2.2.2 Insert the word.
         edit.insert(document.uri, range.start, replacedWord);
         break;
       case "modify":
-        // 2.1.3 Modify the word.
+        // 2.2.3 Modify the word.
         // Delete the word.
         edit.delete(document.uri, range);
         // And then insert the new word.
@@ -60,17 +63,17 @@ export const fixCommand = vscode.commands.registerCommand(
     // Apply the edit
     vscode.workspace.applyEdit(edit);
 
-    // 2.2 Update the hover information.
-    // 2.2.1 Remove the hover information from the store.
+    // 2.3 Update the hover information.
+    // 2.3.1 Remove the hover information from the store.
     DiagnasticStore.delete({
       fileName: document.fileName,
       id: inputDiagnostic.code as number,
     });
 
-    // 2.3 Update the diagnostics for the document.
+    // 2.4 Update the diagnostics for the document.
     const newDiagnostics: vscode.Diagnostic[] = [];
     for (const diagnostic of diagnosticCollection.get(document.uri)!) {
-      // 2.3.1  Pick the new diagnostics.
+      // 2.4.1  Pick the new diagnostics.
       if (diagnostic.code !== inputDiagnostic.code) {
         const isSameLine =
           inputDiagnostic.range.start.line === diagnostic.range.start.line;
@@ -80,7 +83,7 @@ export const fixCommand = vscode.commands.registerCommand(
         const changedWordCount =
           hoverInformation.edition.toWord.length -
           hoverInformation.edition.fromWord.length;
-        // 2.3.2 Update the range of the diagnostic when the diagnostic is behind the inputDiagnostic.
+        // 2.4.2 Update the range of the diagnostic when the diagnostic is behind the inputDiagnostic.
         if (isSameLine && isBehing && changedWordCount !== 0) {
           const startLine = diagnostic.range.start.line;
           const startChart =
@@ -97,7 +100,7 @@ export const fixCommand = vscode.commands.registerCommand(
         newDiagnostics.push(diagnostic);
       }
     }
-    // 2.3.2 Clear the old diagnostics and set the new diagnostics.
+    // 2.4.2 Clear the old diagnostics and set the new diagnostics.
     reloadDiagnosticCollection(document.uri, newDiagnostics);
 
     // 3. Return the result.
