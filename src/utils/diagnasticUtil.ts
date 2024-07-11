@@ -10,7 +10,7 @@ export const generateCode = () => diagnosticCode++;
 let setDiagnosticsTimer: NodeJS.Timeout | null = null;
 
 /**
- *
+ * Flush the diagnostic collection for the specified URI.
  */
 export const reloadDiagnosticCollection = (
   uri: vscode.Uri,

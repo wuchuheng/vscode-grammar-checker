@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
+// @ts-ignore
 import { updateDiagnostic } from "./updateDiagnosticUtil";
+// @ts-ignore
 import { updateDiagnosticInCurrentComment as updateDiagnosticInCurrentCommentPosition } from "./updateDiagnosticInCurrentComment";
 import { getFlashState } from "../../store/isChangeFromActionCodeStore";
 

@@ -91,7 +91,7 @@ ${requestData.data}
   // 2.5 Remove the invalid characters from the content
   content = content.trim();
   const contentList = content.trim().split("\n");
-  const inputList = requestData.data.split("\n");
+  const inputList = requestData.data;
   // 2.5.1 If the count of the lines in the content is not equal to the input, then throw an error
   if (contentList.length !== inputList.length) {
     LogUtil.error(`

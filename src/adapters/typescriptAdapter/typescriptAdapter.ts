@@ -31,11 +31,11 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
   }
 
   removeTrackLineCommentFormat(
-    comment: string
+    comment: string[]
   ): RemoveCommentFormatResultType[] {
     // 1. Handling input.
     // 2. Processing logic.
-    let lines = comment.split("\n");
+    let lines = comment;
     // 2.1 Build the edits
     const edits: RemoveCommentFormatResultType[] = lines.map((line) => {
       // 2.1.1 Extract the spaces and the formated format character before the comment comment.
@@ -52,18 +52,21 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     return edits;
   }
 
-  removeSingleLineCommentFormat(line: string): RemoveCommentFormatResultType[] {
+  removeSingleLineCommentFormat(
+    lines: string[]
+  ): RemoveCommentFormatResultType[] {
     // 1. Handling input.
     // 2. Processing logic.
 
     // 2.1.1 Extract the spaces and the formated format character before the comment comment.
     const regexPattern = /^\s*\/\/+\s*(\d\.*)*\s*/;
-    const spacesBeforeComment = line.match(regexPattern);
+    const text = lines.join("\n");
+    const spacesBeforeComment = text.match(regexPattern);
     const prefix: string = spacesBeforeComment ? spacesBeforeComment[0] : "";
     const result = [
       {
         prefix,
-        line: line.substring(prefix.length),
+        line: text.substring(prefix.length),
       },
     ];
 
@@ -97,23 +100,23 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     });
 
     // 2.3 Send the request to the OpenAI API, and get the response from the API.
-    const data: string = lines.map((line) => line.line).join("\n");
+    const data: string[] = lines.map((line) => line.line);
     const args: RequestData = {
       ...requestArgs,
       prompt: typescriptPrompt,
       data,
     };
-    let response = await next(args);
+    let response = (await next(args)).split("\n");
 
     // 2.4 Remove the prefix of the comment. like: `//` and `*` before the comment, because the character is removed before sending the request, and if the response contains the character, the character should be removed.
     const removedResult =
       requestArgs.commentType === "track"
         ? this.removeTrackLineCommentFormat(response)
         : this.removeSingleLineCommentFormat(response);
-    response = removedResult.map((comment) => comment.line).join("\n");
+    response = removedResult.map((comment) => comment.line);
 
     // 2.4 Restore the empty lines.
-    const responseLines = response.split("\n");
+    const responseLines = response;
     removedEmptyLineIndexList.forEach((index) => {
       responseLines.splice(index, 0, "");
     });
@@ -126,7 +129,7 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     const result = responseLines.join("\n");
 
     // 2.6　Log the result.
-    if (result !== requestArgs.data) {
+    if (result !== requestArgs.data.join("\n")) {
       LogUtil.debug(`
 The changes of the comment:
 input: ${requestArgs.data}

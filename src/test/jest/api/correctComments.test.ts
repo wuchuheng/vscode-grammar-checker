@@ -56,7 +56,7 @@ describe("The test for Correcting the comments", () => {
       const coorecedTask = correctComments({
         prompt: defaultPrompt,
         commentType: item.testContent.includes("\n") ? "track" : "single",
-        data: item.testContent,
+        data: item.testContent.split("\n"),
       });
       tasks.push(coorecedTask);
     }

@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { HoverProvider } from "./providers/hoverProvider";
 import { CodeActionProvider } from "./providers/codeActionProvider";
-import { checkCommand } from "./commands/checkCommand";
+import { checkCommand } from "./commands/checkCommand/checkCommand";
 import { diagnosticCollection } from "./diagnosticCollection/diagnosticCollection";
 import { fixCommand } from "./commands/fixCommand";
 import LanguageAdapterManager from "./adapters/languageAdapterManager";

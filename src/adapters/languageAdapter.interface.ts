@@ -4,7 +4,7 @@ export type CommentType = "single" | "track";
 export type RequestData = {
   prompt: string;
   commentType: CommentType;
-  data: string;
+  data: string[];
 };
 
 /**

@@ -2,4 +2,6 @@
 
 [x] The code action to remove some characters in the document is not working after the action executed, the document is not updated, so the document must be deleted the specific range of the characters.
 
-[] Fefactor the function to format comment and unformat in the command `checkCommand`.
+[x] Refactor the function to format comment and unformat in the command `checkCommand`.
+
+[ ] Remove the space characters before the middleware called, and restore the removed space characters after the middleware called.
