@@ -28,6 +28,10 @@
       {
         "command": "GrammarChecker.fix",
         "title": "Grammar checker: fix"
+      },
+      {
+        "command": "GrammarChecker.removeApiKey",
+        "title": "Grammar checker: remove api key"
       }
     ],
     "diagnostics": {
@@ -54,7 +58,7 @@
       "type": "object",
       "title": "Grammar checker Extension Configuration",
       "properties": {
-        "grammarChecker.modelSecretKey": {
+        "grammarChecker.apiKey": {
           "default": "",
           "description": "The secret key of the model will be used to access the model."
         }

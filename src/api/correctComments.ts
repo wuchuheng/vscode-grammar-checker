@@ -27,7 +27,7 @@ export const correctComments = async (
 
   // 2.2. Create post request to the OpenAI API
   // 2.2.1 Get the arguments for the API request.
-  const secretKey = getSecretKey();
+  const secretKey = await getSecretKey();
 
   // 2.2.3 Send the request to the OpenAI API
   let content: string = "";
