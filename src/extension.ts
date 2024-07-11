@@ -30,22 +30,27 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(removedApiKeyCommand);
 
   // 5. Used to display the details of the error when there is an error and hover over the error.
-  context.subscriptions.push(
-    vscode.languages.registerHoverProvider("typescript", new HoverProvider())
-  );
-  // 4.1 Update the diagnostic store when the document is changed.
+  LanguageAdapterManager.languageIds.forEach((languageId) => {
+    context.subscriptions.push(
+      vscode.languages.registerHoverProvider(languageId, new HoverProvider())
+    );
+  });
+
+  // 6.1 Update the diagnostic store when the document is changed.
   vscode.workspace.onDidChangeTextDocument(onDidChangeTextDocumentProvider);
 
-  // 6. Provide the code actions to fix the error.
-  context.subscriptions.push(
-    vscode.languages.registerCodeActionsProvider(
-      { scheme: "file", language: "typescript" },
-      new CodeActionProvider(),
-      {
-        providedCodeActionKinds: CodeActionProvider.providedCodeActionKinds,
-      }
-    )
-  );
+  // 7. Provide the code actions to fix the error.
+  LanguageAdapterManager.languageIds.forEach((languageId) => {
+    context.subscriptions.push(
+      vscode.languages.registerCodeActionsProvider(
+        { scheme: "file", language: languageId },
+        new CodeActionProvider(),
+        {
+          providedCodeActionKinds: CodeActionProvider.providedCodeActionKinds,
+        }
+      )
+    );
+  });
 
   // 7. Execute the command `grammarChecker.check` when the file is opened.
   vscode.workspace.onDidOpenTextDocument((document) => {

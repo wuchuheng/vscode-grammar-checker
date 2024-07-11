@@ -1,5 +1,5 @@
 import { correctComments } from "../../../api/correctComments";
-import { correctCommentPrompt } from "../../../prompts/commentCorrectedPrompt";
+import { defaultPrompt } from "../../../prompts/defaultPrompt";
 
 describe("The test for Correcting the comments", () => {
   test("Corrected Testing", async () => {
@@ -54,7 +54,7 @@ describe("The test for Correcting the comments", () => {
     const tasks: Promise<string>[] = [];
     for (const item of input) {
       const coorecedTask = correctComments({
-        prompt: correctCommentPrompt,
+        prompt: defaultPrompt,
         commentType: item.testContent.includes("\n") ? "track" : "single",
         data: item.testContent,
       });

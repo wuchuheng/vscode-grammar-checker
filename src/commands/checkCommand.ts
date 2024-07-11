@@ -5,7 +5,7 @@ import { translateEditionToRange } from "../utils/vscodeUtils";
 import { DiagnasticStore, HoverInformation } from "../store/diagnasticStore";
 import { checkCommandIdentifier, diagnosticSource } from "../config/config";
 import { commandValidator } from "../validators/commandValidator";
-import { correctCommentPrompt } from "../prompts/commentCorrectedPrompt";
+import { defaultPrompt } from "../prompts/defaultPrompt";
 import {
   generateCode,
   reloadDiagnosticCollection,
@@ -45,19 +45,22 @@ export const checkCommand = vscode.commands.registerCommand(
     const editor = vscode.window.activeTextEditor!;
     const document = editor!.document;
     const adapter = LanguageAdapterManager.getAdapter(document.languageId);
-
-    const comments =
+    let comments =
       inputComments.length > 0
         ? inputComments
         : adapter.extractComments(document);
+
+    // 2.1.1 Filter out the empty comments.
+    comments = comments.filter((comment) => comment.text.trim() !== "");
+
     // 2.2 Collect the processing task for each comment to correct the comments.
     const tasks: Promise<string>[] = [];
     comments.forEach((comment) => {
-      // 2.2.1 Call the request middleware of the adapter where the adapter can do something for a specific language before the request is made.
+      // 2.2.2 Call the request middleware of the adapter where the adapter can do something for a specific language before the request is made.
       const commentType: CommentType =
         comment.start.line !== comment.end.line ? "track" : "single";
       const requestArgs: RequestData = {
-        prompt: correctCommentPrompt,
+        prompt: defaultPrompt,
         commentType: commentType,
         data: comment.text,
       };

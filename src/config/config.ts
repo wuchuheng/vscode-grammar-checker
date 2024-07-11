@@ -2,6 +2,7 @@ import "dotenv/config";
 import LanguageAdapterInterface from "../adapters/languageAdapter.interface";
 import TypescriptAdapter from "../adapters/typescriptAdapter/typescriptAdapter";
 import { getApiKeyLogic } from "../utils/configUtil";
+import MarkdownAdapter from "../adapters/markdownAdapter/markdownAdapter";
 
 // The endpoint url for accessing the API of the language model.
 export const API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
@@ -36,4 +37,5 @@ export const removedApiKeyCommandIdentifier = "GrammarChecker.removeApiKey";
  */
 export const adapterList: LanguageAdapterInterface[] = [
   new TypescriptAdapter(),
+  new MarkdownAdapter(),
 ];

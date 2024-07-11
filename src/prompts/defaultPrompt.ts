@@ -1,4 +1,4 @@
-export const correctCommentPrompt = `
+export const defaultPrompt = `
 # Role: 专业英语语法检察员
 
 # Goals

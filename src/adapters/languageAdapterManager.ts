@@ -12,6 +12,12 @@ export default class LanguageAdapterManager {
   private static _adapters: Map<string, LanguageAdapterInterface> = new Map();
   private static _isInitialized = false;
 
+  /**
+   * Initialize the adapter manager.
+   *
+   * The adapter manager must be initialized before using it.
+   * @param context
+   */
   public static initialize(context: vscode.ExtensionContext): void {
     // 1. Handling input.
     // 1.1 If the adapter manager is already initialized, throw an error.
@@ -44,6 +50,11 @@ export default class LanguageAdapterManager {
     // 3. Return result.
   }
 
+  /**
+   * Register an adapter to the manager.
+   * @param languageId
+   * @param adapter
+   */
   public static registerAdapter(
     languageId: string,
     adapter: LanguageAdapterInterface
@@ -68,10 +79,18 @@ export default class LanguageAdapterManager {
     // 3. Return result.
   }
 
+  /**
+   * Check if the adapter exists.
+   * @param languageId
+   * @returns
+   */
   static has(languageId: string): boolean {
     return this._adapters.has(languageId);
   }
 
+  /**
+   * Get the adapter for the specific language.
+   */
   public static getAdapter(languageId: string): LanguageAdapterInterface {
     // 1. Handling input.
     // 1.1 Validate input.
@@ -90,6 +109,17 @@ export default class LanguageAdapterManager {
 
     // 3. Return result.
 
+    return result;
+  }
+
+  /**
+   * Get the list of language ids.
+   */
+  public static get languageIds(): string[] {
+    // 1. Processing logic.
+    const result = Array.from(this._adapters.keys());
+
+    // 2. Return result.
     return result;
   }
 }
