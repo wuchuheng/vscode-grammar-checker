@@ -1,10 +1,6 @@
 import * as vscode from "vscode";
 import { Comment } from "../adapters/typescriptAdapter/typescriptUtil";
-import {
-  apiKeyName,
-  fixCommandIdentifier,
-  removedApiKeyCommandIdentifier,
-} from "../config/config";
+import { apiKeyName, removedApiKeyCommandIdentifier } from "../config/config";
 import { ChangedOperation } from "../utils/compareSentenceUtil";
 import { getContext } from "../store/contextStore";
 

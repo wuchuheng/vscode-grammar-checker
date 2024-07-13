@@ -1,7 +1,6 @@
-import * as assert from "assert";
 import { describe, test } from "mocha";
-import { removeInvalideChart } from "./checkCommandUtil";
-import { log } from "console";
+import { RemovedChartType, removeInvalideChart } from "./checkCommandUtil";
+import * as assert from "assert";
 
 describe("CheckCommandUtil test", () => {
   test("Test function removeInvalideChart ", () => {
@@ -14,7 +13,18 @@ describe("CheckCommandUtil test", () => {
       "  ",
     ];
     const result = removeInvalideChart(testInput);
-    log("hello");
-    debugger;
+
+    const expectedValue = ["test1", "test2", "test3", "test4"];
+    assert.deepEqual(result.value, expectedValue);
+
+    const expectedRemovedTextList: RemovedChartType[] = [
+      { lineIndex: 0, prefix: "  ", isEntireLine: true },
+      { lineIndex: 1, prefix: "  ", isEntireLine: false },
+      { lineIndex: 2, prefix: "", isEntireLine: false },
+      { lineIndex: 3, prefix: "  ", isEntireLine: false },
+      { lineIndex: 4, prefix: "", isEntireLine: false },
+      { lineIndex: 5, prefix: "  ", isEntireLine: true },
+    ];
+    assert.deepEqual(result.removedTextList, expectedRemovedTextList);
   });
 });

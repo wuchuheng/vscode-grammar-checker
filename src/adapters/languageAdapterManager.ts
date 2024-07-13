@@ -1,4 +1,3 @@
-import { log } from "console";
 import LanguageAdapterInterface from "./languageAdapter.interface";
 import * as fs from "fs";
 import * as path from "path";

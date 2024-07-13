@@ -115,7 +115,7 @@ export const buildDiagnosticsAndHoverInformation = (
   return { diagnostics, hoverInformationList };
 };
 
-type RemovedChartType = {
+export type RemovedChartType = {
   lineIndex: number;
   prefix: string;
   isEntireLine: boolean;

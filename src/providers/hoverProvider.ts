@@ -31,7 +31,7 @@ export class HoverProvider implements vscode.HoverProvider {
   public provideHover(
     document: vscode.TextDocument,
     position: vscode.Position,
-    token: vscode.CancellationToken
+    _: vscode.CancellationToken
   ): vscode.ProviderResult<vscode.Hover> {
     // 1. Handling input.
     // 2. Progressing Logic.

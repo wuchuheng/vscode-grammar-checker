@@ -11,7 +11,7 @@ export class CodeActionProvider implements vscode.CodeActionProvider {
     document: vscode.TextDocument,
     range: vscode.Range,
     context: vscode.CodeActionContext,
-    token: vscode.CancellationToken
+    _: vscode.CancellationToken
   ): vscode.CodeAction[] {
     // 1. Handling input.
     // 2. Processing logic.

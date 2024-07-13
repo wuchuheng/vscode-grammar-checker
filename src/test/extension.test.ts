@@ -1,5 +1,3 @@
-import * as assert from "assert";
-
 // suite("Extension Test Suite", () => {
 //   test("AI test", () => {
 //     console.log("hello");
