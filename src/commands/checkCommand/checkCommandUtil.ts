@@ -177,12 +177,16 @@ export function restoreRemovedText(
 ): string[] {
   // 2. Processing input.
   // 2. Processing logic.
-  const result: string[] = lines;
+  const result: string[] = [];
+  let offset = 0;
   removedTextList.forEach((removedItem, index) => {
     if (removedItem.isEntireLine) {
       result.push(removedItem.prefix);
+      offset++;
     } else {
-      result[index] = removedItem.prefix + result[index];
+      const truthIndex = index - offset;
+      const line = lines[truthIndex];
+      result.push(removedItem.prefix + line);
     }
   });
 
