@@ -1,5 +1,7 @@
+import { assert } from "console";
 import { correctComments } from "../../../api/correctComments";
 import { defaultPrompt } from "../../../prompts/defaultPrompt";
+import { describe, test } from "mocha";
 
 describe("The test for Correcting the comments", () => {
   test("Corrected Testing", async () => {
@@ -89,8 +91,8 @@ Actual: ${response}`);
     }
 
     // 2.5 Assert the final result
-    expect(isTestingPassed).toBe(true);
+    assert(isTestingPassed === true);
 
     // 3. Output handling
-  }, 100000);
+  });
 });

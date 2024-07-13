@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { correctComments } from "../../api/correctComments";
+import { correctComments } from "../../api/correctComments/correctComments";
 import { Comment } from "../../adapters/typescriptAdapter/typescriptUtil";
 import { checkCommandIdentifier } from "../../config/config";
 import { commandValidator } from "../../validators/commandValidator";
@@ -19,6 +19,8 @@ import {
   getAdapter,
   getComment,
   getDocument,
+  removeInvalideChart,
+  restoreRemovedText,
   setHoverInformation,
 } from "./checkCommandUtil";
 
@@ -54,6 +56,8 @@ export const checkCommand = vscode.commands.registerCommand(
       let data = comment.text.split("\n");
 
       // 2.2.2 Remove prefix space characters preceded by each line
+      const { value: newData, removedTextList } = removeInvalideChart(data);
+      data = newData;
 
       // 2.2.3 Add the async task to the task list.
       const requestArgs: RequestData = {
@@ -66,7 +70,15 @@ export const checkCommand = vscode.commands.registerCommand(
         requestArgs,
         next: async (args) => correctComments(args),
       });
-      tasks.push(newTask);
+      tasks.push(
+        newTask.then((res) => {
+          // TODO: The response changed to list of string is preferred.
+          let lines = res.split("\n");
+          // 2.2.4 Restore the removed text.
+          const result = restoreRemovedText(lines, removedTextList);
+          return result.join("\n");
+        })
+      );
     });
     const correctedComments = await Promise.all(tasks);
 

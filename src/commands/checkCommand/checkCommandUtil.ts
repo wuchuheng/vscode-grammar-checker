@@ -114,3 +114,78 @@ export const buildDiagnosticsAndHoverInformation = (
   // 3. Return the result.
   return { diagnostics, hoverInformationList };
 };
+
+type RemovedChartType = {
+  lineIndex: number;
+  prefix: string;
+  isEntireLine: boolean;
+};
+export type RemovePrefixSpacesResultType = {
+  value: string[];
+  removedTextList: RemovedChartType[];
+};
+
+/**
+ * Remove invalid characters from the data.
+ * @param data
+ * @returns
+ */
+export const removeInvalideChart = (
+  data: string[]
+): RemovePrefixSpacesResultType => {
+  // 2. Processing logic.
+  const newData: string[] = [];
+  const invalideChart: RemovedChartType[] = [];
+  data.forEach((line, index) => {
+    // 2.1 If the line is empty.
+    if (line.trim() === "") {
+      const removedItem: RemovedChartType = {
+        isEntireLine: true,
+        lineIndex: index,
+        prefix: line,
+      };
+      invalideChart.push(removedItem);
+    } else {
+      // 2.2 Remove the prefix space characters.
+      const regexPattern = /^(\s*)/;
+      const matchResult = line.match(regexPattern);
+      const prefix: string = matchResult ? matchResult[0] : "";
+      const newLine = line.replace(regexPattern, "");
+      newData.push(newLine);
+      invalideChart.push({ lineIndex: index, prefix, isEntireLine: false });
+    }
+  });
+
+  // 2.3 Build the result.
+  const result: RemovePrefixSpacesResultType = {
+    value: newData,
+    removedTextList: invalideChart,
+  };
+
+  // 3. Return result.
+  return result;
+};
+
+/**
+ * Restore the removed text.
+ * @param lines
+ * @param removedTextList
+ */
+export function restoreRemovedText(
+  lines: string[],
+  removedTextList: RemovedChartType[]
+): string[] {
+  // 2. Processing input.
+  // 2. Processing logic.
+  const result: string[] = lines;
+  removedTextList.forEach((removedItem, index) => {
+    if (removedItem.isEntireLine) {
+      result.push(removedItem.prefix);
+    } else {
+      result[index] = removedItem.prefix + result[index];
+    }
+  });
+
+  // 3. Return result.
+  return result;
+}

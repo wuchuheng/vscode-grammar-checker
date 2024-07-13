@@ -1,8 +1,10 @@
+import assert from "assert";
 import {
   ChangedOperation,
   compareSentences,
   convertComparedSentences,
 } from "../../utils/compareSentenceUtil";
+import { describe, test } from "mocha";
 
 describe("tmp", () => {
   test("Test", () => {
@@ -36,6 +38,6 @@ describe("tmp", () => {
       },
     ];
 
-    expect(result).toEqual(expectedValue);
+    assert(result === expectedValue);
   });
 });

@@ -1,10 +1,11 @@
-import { describe, test } from "@jest/globals";
+import { describe, test } from "mocha";
 import {
   convertComparedSentences,
   compareSentences,
   ChangedOperation,
   tokenize,
 } from "../../utils/compareSentenceUtil";
+import assert from "assert";
 
 describe("The test for the wordLevenshteinDistance", () => {
   test("Corrected the tracking of the comments", () => {
@@ -33,7 +34,7 @@ describe("The test for the wordLevenshteinDistance", () => {
       },
     ];
 
-    expect(result).toEqual(expectedValue);
+    assert(result === expectedValue);
   });
 
   test("Corrected the tracking of the comments #2", () => {
@@ -61,7 +62,7 @@ describe("The test for the wordLevenshteinDistance", () => {
       },
     ];
 
-    expect(result).toEqual(expectedValue);
+    assert(result === expectedValue);
   });
 
   test("Corrected the tracking of the comments #3", () => {
@@ -80,7 +81,7 @@ describe("The test for the wordLevenshteinDistance", () => {
       },
     ];
 
-    expect(result).toEqual(expectedValue);
+    assert(result === expectedValue);
   });
 
   test("Corrected the tracking of the comments #4", () => {
@@ -89,7 +90,7 @@ describe("The test for the wordLevenshteinDistance", () => {
     const editions = compareSentences(testItem.source, testItem.target);
     let result = convertComparedSentences(testItem.source, editions);
 
-    expect(result).toEqual([]);
+    assert(result.length === 0);
   });
 
   test("Corrected the tracking of the comments #5", () => {
@@ -122,7 +123,7 @@ describe("The test for the wordLevenshteinDistance", () => {
       },
     ];
 
-    expect(result).toEqual(expectedValue);
+    assert(result === expectedValue);
   });
 
   test("Corrected the tracking of the comments #6", () => {
@@ -140,18 +141,18 @@ describe("The test for the wordLevenshteinDistance", () => {
       },
     ];
 
-    expect(result).toEqual(expectedValue);
+    assert(result === expectedValue);
   });
 
   test("Test function `tokenize`", () => {
     const testItem = "There are a dogs";
     const result = tokenize(testItem);
     const expected = ["There", " ", "are", " ", "a", " ", "dogs"];
-    expect(result).toEqual(expected);
+    assert(result === expected);
 
     const testItem2 = "There    are a        dogs";
     const result2 = tokenize(testItem2);
     const expected2 = ["There", "    ", "are", " ", "a", "        ", "dogs"];
-    expect(result2).toEqual(expected2);
+    assert(result2 === expected2);
   });
 });
