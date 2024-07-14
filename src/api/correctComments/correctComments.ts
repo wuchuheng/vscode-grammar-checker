@@ -1,8 +1,7 @@
-import axios from "axios";
-import { API_URL, getSecretKey, MODEL_ID } from "../../config/config";
 import { log } from "console";
 import LogUtil from "../../utils/logUtil";
 import { RequestData } from "../../adapters/languageAdapter.interface";
+import AiClient from "../../utils/aiClient";
 
 const maximumRetryCount = 3;
 
@@ -21,10 +20,7 @@ export const correctComments = async (
   // 2. Processing Logic
 
   // 2.2. Create post request to the OpenAI API
-  // 2.2.1 Get the arguments for the API request.
-  const secretKey = await getSecretKey();
-
-  // 2.2.3 Send the request to the OpenAI API
+  // 2.2.1 Send the request to the OpenAI API
   let content: string = "";
   let isResponseSuccess: boolean = false;
   let retryCount: number = 0;
@@ -33,31 +29,15 @@ export const correctComments = async (
   while (!isResponseSuccess && retryCount < retryLimit) {
     retryCount++;
     try {
-      const response = await axios.post(
-        `${API_URL}`,
+      content = await AiClient([
+        { role: "assistant", content: requestData.prompt },
         {
-          model: MODEL_ID,
-          messages: [
-            {
-              role: "assistant",
-              content: requestData.prompt,
-            },
-            {
-              role: "user",
-              content: `\`\`\`
+          role: "user",
+          content: `\`\`\`
 ${data}
 \`\`\``,
-            },
-          ],
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${secretKey}`,
-          },
-        }
-      );
-      content = response.data.choices[0].message.content;
+      ]);
       isResponseSuccess = true;
     } catch (error) {
       if (retryCount === retryLimit) {

@@ -10,13 +10,29 @@ enum LogLevel {
 export default class LogUtil {
   // Method to log messages with a specific log level
   static log(level: LogLevel, messages: string | string[]): void {
+    // 2. Processing logic.
+    // 2.1 Get the current time
     const time = new Date();
-    // Date time format like: 2021-09-01 12:00:00
-    const datetimeFormat = `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`;
+    // Date time format like: 12:00:00
+    const padStart = (value: number) => value.toString().padStart(2, "0");
+    const datetimeFormat = `${padStart(time.getMonth() + 1)}-${padStart(time.getDate())} ${padStart(time.getHours())}:${padStart(time.getMinutes())}:${padStart(time.getSeconds())}`;
     const formattedMessages = Array.isArray(messages)
       ? messages.join("\n")
       : messages;
-    console.log(`[${datetimeFormat}] [${level}]: ${formattedMessages}`);
+
+    // 2.2 Get the previou file name and line number
+    const stack = new Error().stack;
+    const stackLines = stack ? stack.split("\n") : [];
+    const stackLine = stackLines.length > 3 ? stackLines[3] : "";
+    const regexPatter = /\((.*)\)/;
+    const pathList = stackLine.match(regexPatter)?.pop() || "";
+    const fileName = pathList.split("/").pop();
+
+    // 2.3 Build the log message
+    const message = `[${datetimeFormat}][${fileName}][${level}]: ${formattedMessages}`;
+
+    // 3. Print message.
+    console.log(message);
   }
 
   // Convenience methods for each log level
