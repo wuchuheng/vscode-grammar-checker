@@ -27,13 +27,13 @@ export default class MarkdownAdapter implements LanguageAdapterInterface {
   async middlewareHandle(args: {
     requestArgs: RequestData;
     next: (args: RequestData) => Promise<string>;
-  }): Promise<string> {
+  }): Promise<string[]> {
     const prompt = markdownPrompt;
     const response = await args.next({
       ...args.requestArgs,
       prompt,
     });
 
-    return response;
+    return response.split("\n");
   }
 }

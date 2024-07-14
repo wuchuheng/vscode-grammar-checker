@@ -66,19 +66,18 @@ export const checkCommand = vscode.commands.registerCommand(
         data,
       };
       const adapter = getAdapter();
-      const newTask = adapter.middlewareHandle({
-        requestArgs,
-        next: async (args) => correctComments(args),
-      });
-      tasks.push(
-        newTask.then((res) => {
-          // TODO: The response changed to list of string is preferred.
-          let lines = res.split("\n");
+      const newTask: Promise<string> = adapter
+        .middlewareHandle({
+          requestArgs,
+          next: async (args) => correctComments(args),
+        })
+        .then((lines) => {
           // 2.2.4 Restore the removed text.
           const result = restoreRemovedText(lines, removedTextList);
           return result.join("\n");
-        })
-      );
+        });
+
+      tasks.push(newTask);
     });
     const correctedComments = await Promise.all(tasks);
 

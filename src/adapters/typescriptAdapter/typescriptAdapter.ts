@@ -36,10 +36,10 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     // 1. Handling input.
     // 2. Processing logic.
     let lines = comment;
-    // 2.1 Build the edits
+    // 2.1 Build the edit.
     const edits: RemoveCommentFormatResultType[] = lines.map((line) => {
-      // 2.1.1 Extract the spaces and the formated format character before the comment comment.
-      const regexPattern = /^\s*(:?\*\/\s*|\/\*+\s?|\*?\s*(\d\.*)*\s*)/gm;
+      // 2.1.1 Extract the spaces and the formatted format character before the comment.
+      const regexPattern = /^(:?\*\/\s*|\/\*+\s?|\*?\s*(\d\.*)*\s*)/gm;
       const spacesBeforeComment = line.match(regexPattern);
       const prefix: string = spacesBeforeComment ? spacesBeforeComment[0] : "";
       return {
@@ -58,8 +58,8 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     // 1. Handling input.
     // 2. Processing logic.
 
-    // 2.1.1 Extract the spaces and the formated format character before the comment comment.
-    const regexPattern = /^\s*\/\/+\s*(\d\.*)*\s*/;
+    // 2.1.1 Extract the spaces and formatted format characters before the comment.
+    const regexPattern = /^\/\/+\s*(\d\.*)*\s*/;
     const text = lines.join("\n");
     const spacesBeforeComment = text.match(regexPattern);
     const prefix: string = spacesBeforeComment ? spacesBeforeComment[0] : "";
@@ -80,8 +80,8 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
   }: {
     requestArgs: RequestData;
     next: (args: RequestData) => Promise<string>;
-  }): Promise<string> {
-    // 1. Handing input.
+  }): Promise<string[]> {
+    // 1. Handling input.
     // 2. Processing logic.
     // 2.1 Remove the track comment format.
     const lines =
@@ -98,28 +98,26 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     };
     let response = (await next(args)).split("\n");
 
-    // 2.3 Remove the prefix of the comment. like: `//` and `*` before the comment, because the character is removed before sending the request, and if the response contains the character, the character should be removed.
+    // 2.3 Remove the prefix of the comment, like: `//` and `*` before the comment, because the character is removed before sending the request, and if the response contains the character, the character should be removed.
     const removedResult =
       requestArgs.commentType === "track"
         ? this.removeTrackLineCommentFormat(response)
         : this.removeSingleLineCommentFormat(response);
     response = removedResult.map((comment) => comment.line);
 
-    const responseLines = response;
+    const result = response;
 
     // 2.4 Restore the removed format for each line.
     lines.forEach((comment, index) => {
-      responseLines[index] = comment.prefix + responseLines[index];
+      result[index] = comment.prefix + result[index];
     });
 
-    const result = responseLines.join("\n");
-
     // 2.5　Log the result.
-    if (result !== requestArgs.data.join("\n")) {
+    if (result !== requestArgs.data) {
       LogUtil.debug(`
 The changes of the comment:
-input: ${requestArgs.data}
-output: ${result}`);
+input: ${requestArgs.data.join("\n")}
+output: ${result.join("\n")}`);
     }
 
     // 3. Return the result.

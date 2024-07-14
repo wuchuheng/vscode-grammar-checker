@@ -46,5 +46,5 @@ export default interface LanguageAdapterInterface {
   middlewareHandle(args: {
     requestArgs: RequestData;
     next: (args: RequestData) => Promise<string>;
-  }): Promise<string>;
+  }): Promise<string[]>;
 }
