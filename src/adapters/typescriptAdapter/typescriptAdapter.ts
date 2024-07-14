@@ -79,7 +79,7 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     next,
   }: {
     requestArgs: RequestData;
-    next: (args: RequestData) => Promise<string>;
+    next: (args: RequestData) => Promise<string[]>;
   }): Promise<string[]> {
     // 1. Handling input.
     // 2. Processing logic.
@@ -96,7 +96,7 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
       prompt: typescriptPrompt,
       data,
     };
-    let response = (await next(args)).split("\n");
+    let response = await next(args);
 
     // 2.3 Remove the prefix of the comment, like: `//` and `*` before the comment, because the character is removed before sending the request, and if the response contains the character, the character should be removed.
     const removedResult =
@@ -111,14 +111,6 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     lines.forEach((comment, index) => {
       result[index] = comment.prefix + result[index];
     });
-
-    // 2.5　Log the result.
-    if (result !== requestArgs.data) {
-      LogUtil.debug(`
-The changes of the comment:
-input: ${requestArgs.data.join("\n")}
-output: ${result.join("\n")}`);
-    }
 
     // 3. Return the result.
     return result;

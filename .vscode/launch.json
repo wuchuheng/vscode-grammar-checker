@@ -11,8 +11,10 @@
       "request": "launch",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "${workspaceFolder}/src/test/workspaceForTest/",
-        "${workspaceFolder}/src/test/workspaceForTest/test.md"
+        "${workspaceFolder}/src",
+        "${workspaceFolder}/src/extension.ts"
+        // "${workspaceFolder}/src/test/workspaceForTest/",
+        // "${workspaceFolder}/src/test/workspaceForTest/test.md"
       ],
       "outFiles": ["${workspaceFolder}/dist/**/*.js"],
       "preLaunchTask": "${defaultBuildTask}"

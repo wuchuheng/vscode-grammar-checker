@@ -15,13 +15,8 @@ const maximumRetryCount = 3;
 export const correctComments = async (
   requestData: RequestData,
   tryCount: number = 0
-): Promise<string> => {
-  // * This is multi-line comments
-  // * There is a next line.
-  // * There are next lines.
-  // */`;
-
-  // 1. Input handling
+): Promise<string[]> => {
+  // 1. Input handlin
 
   // 2. Processing Logic
 
@@ -34,6 +29,7 @@ export const correctComments = async (
   let isResponseSuccess: boolean = false;
   let retryCount: number = 0;
   const retryLimit: number = 3;
+  const data = requestData.data.join("\n");
   while (!isResponseSuccess && retryCount < retryLimit) {
     retryCount++;
     try {
@@ -49,7 +45,7 @@ export const correctComments = async (
             {
               role: "user",
               content: `\`\`\`
-${requestData.data}
+${data}
 \`\`\``,
             },
           ],
@@ -73,7 +69,7 @@ ${requestData.data}
   }
 
   // 2.3 Log.
-  LogUtil.debug(`AI input: ${requestData.data}`);
+  LogUtil.debug(`AI input: ${data}`);
   LogUtil.debug(`AI output: ${content}`);
 
   // 2.4 Remove the wrapper of the content in markdown format
@@ -90,13 +86,13 @@ ${requestData.data}
 
   // 2.5 Remove the invalid characters from the content
   content = content.trim();
-  const contentList = content.trim().split("\n");
-  const inputList = requestData.data;
+  const inputData = requestData.data;
+  const result = content.split("\n");
   // 2.5.1 If the count of the lines in the content is not equal to the input, then throw an error
-  if (contentList.length !== inputList.length) {
+  if (result.length !== inputData.length) {
     LogUtil.error(`
-      Input: ${inputList.join("\n")}
-      Output: ${contentList.join("\n")}
+      Input: ${inputData.join("\n")}
+      Output: ${result.join("\n")}
     `);
     if (tryCount < maximumRetryCount) {
       return await correctComments(requestData, tryCount + 1);
@@ -108,5 +104,5 @@ ${requestData.data}
   }
 
   // 3. Return the result.
-  return content;
+  return result;
 };

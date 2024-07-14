@@ -47,7 +47,7 @@ export const checkCommand = vscode.commands.registerCommand(
     const comments = getComment(inputComments);
 
     // 2.2 Collect the processing task for each comment to correct the comments.
-    const tasks: Promise<string>[] = [];
+    const tasks: Promise<string[]>[] = [];
     comments.forEach((comment) => {
       // 2.2.1 Determine the comment type.
       const commentType: CommentType =
@@ -56,37 +56,56 @@ export const checkCommand = vscode.commands.registerCommand(
       let data = comment.text.split("\n");
 
       // 2.2.2 Remove prefix space characters preceded by each line
-      const { value: newData, removedTextList } = removeInvalideChart(data);
-      data = newData;
-
+      const removedOutsideInvalidedChart = removeInvalideChart(data);
       // 2.2.3 Add the async task to the task list.
       const requestArgs: RequestData = {
         prompt: defaultPrompt,
         commentType,
-        data,
+        data: removedOutsideInvalidedChart.value,
       };
       const adapter = getAdapter();
-      const newTask: Promise<string> = adapter
+      const newTask: Promise<string[]> = adapter
         .middlewareHandle({
           requestArgs,
-          next: async (args) => correctComments(args),
+          next: async (args) => {
+            // 2.2.4 Remove the invalid characters from the middleward.
+            const removdedMiddlewareInvalidChart = removeInvalideChart(
+              args.data
+            );
+            const res = await correctComments({
+              ...args,
+              data: removdedMiddlewareInvalidChart.value,
+            });
+            // 2.2.4 Restore the removed text after the next called within the middleware.
+            let result = restoreRemovedText(
+              res,
+              removdedMiddlewareInvalidChart.removedTextList
+            );
+            return result;
+          },
         })
-        .then((lines) => {
-          // 2.2.4 Restore the removed text.
-          const result = restoreRemovedText(lines, removedTextList);
-          return result.join("\n");
+        .then((res) => {
+          // 2.2.5 Restore the removed text after the middleware.
+          res = restoreRemovedText(
+            res,
+            removedOutsideInvalidedChart.removedTextList
+          );
+          return res;
         });
 
       tasks.push(newTask);
     });
     const correctedComments = await Promise.all(tasks);
 
-    // 2.3 Convert the corrected comments to list of deditions.
+    // 2.3 Build the suggestions to correct the comments based on the comparison between the original comments and the corrected comments.
     const commentBindEditions: CommentBindEdition[] = [];
-    correctedComments.forEach((correctedComment, index) => {
+    correctedComments.forEach((correctedComment: string[], index) => {
       const comment = comments[index];
 
-      const wordEdits = compareSentences(comment.text, correctedComment);
+      const wordEdits = compareSentences(
+        comment.text,
+        correctedComment.join("\n")
+      );
       const editions = convertComparedSentences(comment.text, wordEdits);
 
       commentBindEditions.push({ comment, editions });
