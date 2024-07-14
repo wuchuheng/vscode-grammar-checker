@@ -84,22 +84,12 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     // 1. Handing input.
     // 2. Processing logic.
     // 2.1 Remove the track comment format.
-    const unformatComments =
+    const lines =
       requestArgs.commentType === "track"
         ? this.removeTrackLineCommentFormat(requestArgs.data)
         : this.removeSingleLineCommentFormat(requestArgs.data);
 
-    // 2.2 Remove the empty lines.
-    const removedEmptyLineIndexList: number[] = [];
-    const lines = unformatComments.filter((comment, i) => {
-      if (comment.line.trim() === "") {
-        removedEmptyLineIndexList.push(i);
-        return false;
-      }
-      return true;
-    });
-
-    // 2.3 Send the request to the OpenAI API, and get the response from the API.
+    // 2.2 Send the request to the OpenAI API, and get the response from the API.
     const data: string[] = lines.map((line) => line.line);
     const args: RequestData = {
       ...requestArgs,
@@ -108,27 +98,23 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
     };
     let response = (await next(args)).split("\n");
 
-    // 2.4 Remove the prefix of the comment. like: `//` and `*` before the comment, because the character is removed before sending the request, and if the response contains the character, the character should be removed.
+    // 2.3 Remove the prefix of the comment. like: `//` and `*` before the comment, because the character is removed before sending the request, and if the response contains the character, the character should be removed.
     const removedResult =
       requestArgs.commentType === "track"
         ? this.removeTrackLineCommentFormat(response)
         : this.removeSingleLineCommentFormat(response);
     response = removedResult.map((comment) => comment.line);
 
-    // 2.4 Restore the empty lines.
     const responseLines = response;
-    removedEmptyLineIndexList.forEach((index) => {
-      responseLines.splice(index, 0, "");
-    });
 
-    // 2.5 Restore the removed format for each line.
-    unformatComments.forEach((comment, index) => {
+    // 2.4 Restore the removed format for each line.
+    lines.forEach((comment, index) => {
       responseLines[index] = comment.prefix + responseLines[index];
     });
 
     const result = responseLines.join("\n");
 
-    // 2.6　Log the result.
+    // 2.5　Log the result.
     if (result !== requestArgs.data.join("\n")) {
       LogUtil.debug(`
 The changes of the comment:
