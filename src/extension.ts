@@ -9,6 +9,7 @@ import { onDidChangeTextDocumentProvider } from "./providers/onDidChangeTextDocu
 import { checkCommandIdentifier } from "./config/config";
 import { setContext } from "./store/contextStore";
 import { removedApiKeyCommand } from "./commands/removedApiKey";
+import { statusBarIcon } from "./statusBarIcon/statusBarIcon";
 
 /**
  * Activates the extension.
@@ -59,6 +60,10 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.commands.executeCommand(checkCommandIdentifier);
     }
   });
+
+  // Add to subscriptions to ensure proper disposal.
+  // Are you ok?
+  context.subscriptions.push(statusBarIcon);
 }
 
 export function deactivate() {}
