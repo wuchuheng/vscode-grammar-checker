@@ -2,6 +2,15 @@ import * as vscode from "vscode";
 import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
 
 /**
+ * Extract comments from the source code of a TypeScript file.
+ */
+export interface Comment {
+  text: string;
+  start: vscode.Position;
+  end: vscode.Position;
+}
+
+/**
  * Generate the diagnostic code.
  */
 let diagnosticCode: number = 1;

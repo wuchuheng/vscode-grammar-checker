@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
-import { Comment } from "../adapters/typescriptAdapter/typescriptUtil";
 import { apiKeyName, removedApiKeyCommandIdentifier } from "../config/config";
 import { ChangedOperation } from "../utils/compareSentenceUtil";
 import { getContext } from "../store/contextStore";
+import { Comment } from "../utils/diagnosticUtil";
 
 export type CommentBindEdition = {
   comment: Comment;

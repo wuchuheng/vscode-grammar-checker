@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { Comment } from "./typescriptAdapter/typescriptUtil";
+import { Comment } from "../utils/diagnosticUtil";
 export type CommentType = "single" | "track";
 export type RequestData = {
   prompt: string;

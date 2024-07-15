@@ -2,8 +2,8 @@ import { Position, TextDocument, TextDocumentChangeEvent } from "vscode";
 import LanguageAdapterInterface, {
   RequestData,
 } from "../languageAdapter.interface";
-import { Comment } from "../typescriptAdapter/typescriptUtil";
 import { markdownPrompt } from "../../prompts/markdownPrompt";
+import { Comment } from "../../utils/diagnosticUtil";
 
 export default class MarkdownAdapter implements LanguageAdapterInterface {
   supportedLanguageId: string[] = ["markdown"];

@@ -3,7 +3,6 @@ import LanguageAdapterInterface, {
   RequestData,
 } from "../languageAdapter.interface";
 import {
-  Comment,
   extractComments,
   getAffectedCommentsByDeleteChange,
   getAffectedCommentsByInsertChange,
@@ -12,6 +11,7 @@ import {
 import { typescriptPrompt } from "../../prompts/typescriptPrompt";
 import { isGrammarCorrect } from "../../api/grammar/grammar";
 import { getChangedType } from "../../providers/onDidChangeTextDocumentProvider/updateDiagnosticUtil";
+import { Comment } from "../../utils/diagnosticUtil";
 
 type RemoveCommentFormatResultType = {
   line: string;

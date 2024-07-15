@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import { Comment } from "../adapters/typescriptAdapter/typescriptUtil";
 import { fixCommandIdentifier } from "../config/config";
 import { DiagnosticStore, HoverInformation } from "../store/diagnosticStore";
 import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
@@ -7,6 +6,7 @@ import { reloadDiagnosticCollection } from "../utils/diagnosticUtil";
 import { ChangedOperation } from "../utils/compareSentenceUtil";
 import LanguageAdapterManager from "../adapters/languageAdapterManager";
 import { setFlashState } from "../store/isChangeFromActionCodeStore";
+import { Comment } from "../utils/diagnosticUtil";
 
 export type CommentBindEdition = {
   comment: Comment;

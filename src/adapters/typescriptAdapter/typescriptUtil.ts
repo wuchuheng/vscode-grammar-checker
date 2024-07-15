@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import ts from "typescript";
+import { Comment } from "../../utils/diagnosticUtil";
 
 /**
  * Format the comment by using the standard format.
@@ -69,15 +70,6 @@ export const formatSingleLineComment = (content: string): string => {
 
   return content;
 };
-
-/**
- * Extract comments from the source code of a TypeScript file.
- */
-export interface Comment {
-  text: string;
-  start: vscode.Position;
-  end: vscode.Position;
-}
 
 /**
  *  Extract comments from the source code of a TypeScript file.

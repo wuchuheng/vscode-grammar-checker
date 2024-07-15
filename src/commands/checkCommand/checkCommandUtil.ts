@@ -1,12 +1,11 @@
 import * as vscode from "vscode";
 import LanguageAdapterManager from "../../adapters/languageAdapterManager";
-import { Comment } from "../../adapters/typescriptAdapter/typescriptUtil";
 import LanguageAdapterInterface from "../../adapters/languageAdapter.interface";
 import { DiagnosticStore, HoverInformation } from "../../store/diagnosticStore";
 import { CommentBindEdition } from "./checkCommand";
 import { translateEditionToRange } from "../../utils/vscodeUtils";
 import { diagnosticSource } from "../../config/config";
-import { generateCode } from "../../utils/diagnosticUtil";
+import { generateCode, Comment } from "../../utils/diagnosticUtil";
 
 /**
  *  Get the active text document.

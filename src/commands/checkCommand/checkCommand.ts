@@ -1,10 +1,12 @@
 import * as vscode from "vscode";
 import { correctComments } from "../../api/correctComments/correctComments";
-import { Comment } from "../../adapters/typescriptAdapter/typescriptUtil";
 import { checkCommandIdentifier } from "../../config/config";
 import { commandValidator } from "../../validators/commandValidator";
 import { defaultPrompt } from "../../prompts/defaultPrompt";
-import { reloadDiagnosticCollection } from "../../utils/diagnosticUtil";
+import {
+  reloadDiagnosticCollection,
+  Comment,
+} from "../../utils/diagnosticUtil";
 import {
   ChangedOperation,
   compareSentences,

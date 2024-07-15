@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { Comment } from "../adapters/typescriptAdapter/typescriptUtil";
+import { Comment } from "../utils/diagnosticUtil";
 import { ChangedOperation } from "../utils/compareSentenceUtil";
 
 export type HoverInformation = {
