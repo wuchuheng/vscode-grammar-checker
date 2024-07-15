@@ -26,7 +26,7 @@ export const updateDiagnosticInCurrentComment =
       return;
     }
 
-    // 1.2 Check if the change is in a comment, else return.
+    // 1.2 Check if the change is in a comment; otherwise, return.
     const hasAdapter = LanguageAdapterManager.has(event.document.languageId);
     if (!hasAdapter) {
       return;

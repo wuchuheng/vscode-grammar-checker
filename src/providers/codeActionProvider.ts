@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { fixCommandIdentifier, diagnosticSource } from "../config/config";
-import { DiagnasticStore } from "../store/diagnasticStore";
+import { DiagnosticStore } from "../store/diagnosticStore";
 
 export class CodeActionProvider implements vscode.CodeActionProvider {
   public static readonly providedCodeActionKinds = [
@@ -33,7 +33,7 @@ export class CodeActionProvider implements vscode.CodeActionProvider {
     // 1. Handling input.
     // 2. Processing logic.
     // 2.1 Find the hover information by the start position of the range.
-    const hoverInformation = DiagnasticStore.get({
+    const hoverInformation = DiagnosticStore.get({
       fileName: document.fileName,
       id: diagnostic.code as number,
     });

@@ -49,7 +49,7 @@ Every line should be preserved.
 All sentences are correct.
 Every line should be preserved.
 
-# Requirmenets
+# Requirements
 
 1. Maintain the integrity of the computer science terms and context.
 

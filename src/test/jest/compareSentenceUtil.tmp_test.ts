@@ -8,7 +8,7 @@ import { describe, test } from "mocha";
 
 describe("tmp", () => {
   test("Test", () => {
-    // const sourceSentence = "* There are next line.";
+    // const sourceSentence = "* There is a next line.";
     const sourceSentence = " There are several numberic next lines.";
     const targetSentence = "* There are next line.";
     const editOperations = compareSentences(sourceSentence, targetSentence);

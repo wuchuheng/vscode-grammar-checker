@@ -8,25 +8,25 @@ export type RequestData = {
 };
 
 /**
- * The addapter will be responsible for extracting comments from the source code and also for the middleware that will be executed before the request is made.
- * So, the adapter will be invoked by the extension to extract comments based on the language id when the user triggers the command.
+ * The adapter will be responsible for extracting comments from the source code and also for the middleware that will be executed before the request is made.
+ * So, the adapter will be invoked by the extension to extract comments based on the language ID when the user triggers the command.
  */
 export default interface LanguageAdapterInterface {
   /**
-   * The language id of the language that the adapter supports.
+   * The ID of the language that the adapter supports.
    *
-   * This configuration will be used to determine the adapter witch will be used to extract comments from the source code.
+   * This configuration will determine which adapter will be used to extract comments from the source code.
    * @example:
    * - python
    * - javascript
    * - typescript
    */
-  supertedLanguageId: string[];
+  supportedLanguageId: string[];
 
   /**
    * Extracts comments from the source code.
    *
-   * This method will be invoked and used to how to extract comments from the source code.
+   * This method will be invoked and used to extract comments from the source code.
    * @param sourceCode
    * @param document
    * @returns
@@ -37,7 +37,7 @@ export default interface LanguageAdapterInterface {
    * The middleware to be executed before the request is made.
    *
    * The request will be executed like this:
-   * Vs code command -> beforeRequest -> AI model -> vscode command
+   * VS Code command -> beforeRequest -> AI model -> VS Code command
    * If there are something to be done before the request is made, the logic should be implemented here.
    * @param requestArgs
    * @param next

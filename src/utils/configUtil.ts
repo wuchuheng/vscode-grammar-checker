@@ -1,6 +1,6 @@
 import { apiKeyName } from "../config/config";
 import { getContext } from "../store/contextStore";
-import { getApiKeyFromHtmlPanel } from "./accessAipKeyPannelUtil";
+import { getApiKeyFromHtmlPanel } from "./accessAipKeyPanelUtil";
 
 export const getApiKeyLogic = async (): Promise<string> => {
   // 2. Processing logic.

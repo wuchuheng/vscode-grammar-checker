@@ -1,7 +1,7 @@
 import { log } from "console";
 import LogUtil from "../../utils/logUtil";
 import { RequestData } from "../../adapters/languageAdapter.interface";
-import AiClient from "../../utils/aiClient";
+import AiRequest from "../../utils/aiClient";
 
 const maximumRetryCount = 3;
 
@@ -15,7 +15,7 @@ export const correctComments = async (
   requestData: RequestData,
   tryCount: number = 0
 ): Promise<string[]> => {
-  // 1. Input handlin
+  // 1. Input handling
 
   // 2. Processing Logic
 
@@ -29,7 +29,7 @@ export const correctComments = async (
   while (!isResponseSuccess && retryCount < retryLimit) {
     retryCount++;
     try {
-      content = await AiClient([
+      content = await AiRequest([
         { role: "assistant", content: requestData.prompt },
         {
           role: "user",

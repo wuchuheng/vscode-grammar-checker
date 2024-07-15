@@ -4,7 +4,7 @@ import { Comment } from "../../adapters/typescriptAdapter/typescriptUtil";
 import { checkCommandIdentifier } from "../../config/config";
 import { commandValidator } from "../../validators/commandValidator";
 import { defaultPrompt } from "../../prompts/defaultPrompt";
-import { reloadDiagnosticCollection } from "../../utils/diagnasticUtil";
+import { reloadDiagnosticCollection } from "../../utils/diagnosticUtil";
 import {
   ChangedOperation,
   compareSentences,
@@ -19,7 +19,7 @@ import {
   getAdapter,
   getComment,
   getDocument,
-  removeInvalideChart,
+  removeInvalidedChart as removeInvalidedChart,
   restoreRemovedText,
   setHoverInformation,
 } from "./checkCommandUtil";
@@ -56,7 +56,7 @@ export const checkCommand = vscode.commands.registerCommand(
       let data = comment.text.split("\n");
 
       // 2.2.2 Remove prefix space characters preceded by each line
-      const removedOutsideInvalidedChart = removeInvalideChart(data);
+      const removedOutsideInvalidedChart = removeInvalidedChart(data);
       // 2.2.3 Add the async task to the task list.
       const requestArgs: RequestData = {
         prompt: defaultPrompt,
@@ -68,18 +68,18 @@ export const checkCommand = vscode.commands.registerCommand(
         .middlewareHandle({
           requestArgs,
           next: async (args) => {
-            // 2.2.4 Remove the invalid characters from the middleward.
-            const removdedMiddlewareInvalidChart = removeInvalideChart(
+            // 2.2.4 Remove the invalid characters from the middleware.
+            const removedMiddlewareInvalidChart = removeInvalidedChart(
               args.data
             );
             const res = await correctComments({
               ...args,
-              data: removdedMiddlewareInvalidChart.value,
+              data: removedMiddlewareInvalidChart.value,
             });
             // 2.2.4 Restore the removed text after the next called within the middleware.
             let result = restoreRemovedText(
               res,
-              removdedMiddlewareInvalidChart.removedTextList
+              removedMiddlewareInvalidChart.removedTextList
             );
             return result;
           },

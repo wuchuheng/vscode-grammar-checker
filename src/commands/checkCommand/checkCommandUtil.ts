@@ -2,11 +2,11 @@ import * as vscode from "vscode";
 import LanguageAdapterManager from "../../adapters/languageAdapterManager";
 import { Comment } from "../../adapters/typescriptAdapter/typescriptUtil";
 import LanguageAdapterInterface from "../../adapters/languageAdapter.interface";
-import { DiagnasticStore, HoverInformation } from "../../store/diagnasticStore";
+import { DiagnosticStore, HoverInformation } from "../../store/diagnosticStore";
 import { CommentBindEdition } from "./checkCommand";
 import { translateEditionToRange } from "../../utils/vscodeUtils";
 import { diagnosticSource } from "../../config/config";
-import { generateCode } from "../../utils/diagnasticUtil";
+import { generateCode } from "../../utils/diagnosticUtil";
 
 /**
  *  Get the active text document.
@@ -59,10 +59,10 @@ export const setHoverInformation = (
   const editor = vscode.window.activeTextEditor!;
   const fileName = editor.document.fileName;
   // 2.1 Clear the diagnostic in the store for this file.
-  DiagnasticStore.clear(fileName);
+  DiagnosticStore.clear(fileName);
   // 2.2 Add the diagnostic to the store.
   hoverInformationList.forEach((item) => {
-    DiagnasticStore.set({
+    DiagnosticStore.set({
       fileName,
       id: item.diagnostic.code as number,
       value: item,
@@ -130,12 +130,12 @@ export type RemovePrefixSpacesResultType = {
  * @param data
  * @returns
  */
-export const removeInvalideChart = (
+export const removeInvalidedChart = (
   data: string[]
 ): RemovePrefixSpacesResultType => {
   // 2. Processing logic.
   const newData: string[] = [];
-  const invalideChart: RemovedChartType[] = [];
+  const invalidedChart: RemovedChartType[] = [];
   data.forEach((line, index) => {
     // 2.1 If the line is empty.
     if (line.trim() === "") {
@@ -144,7 +144,7 @@ export const removeInvalideChart = (
         lineIndex: index,
         prefix: line,
       };
-      invalideChart.push(removedItem);
+      invalidedChart.push(removedItem);
     } else {
       // 2.2 Remove the prefix space characters.
       const regexPattern = /^(\s*)/;
@@ -152,14 +152,14 @@ export const removeInvalideChart = (
       const prefix: string = matchResult ? matchResult[0] : "";
       const newLine = line.replace(regexPattern, "");
       newData.push(newLine);
-      invalideChart.push({ lineIndex: index, prefix, isEntireLine: false });
+      invalidedChart.push({ lineIndex: index, prefix, isEntireLine: false });
     }
   });
 
   // 2.3 Build the result.
   const result: RemovePrefixSpacesResultType = {
     value: newData,
-    removedTextList: invalideChart,
+    removedTextList: invalidedChart,
   };
 
   // 3. Return result.

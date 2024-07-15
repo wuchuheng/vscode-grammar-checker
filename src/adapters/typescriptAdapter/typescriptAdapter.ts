@@ -4,7 +4,6 @@ import LanguageAdapterInterface, {
 } from "../languageAdapter.interface";
 import { Comment, extractComments } from "./typescriptUtil";
 import { typescriptPrompt } from "../../prompts/typescriptPrompt";
-import LogUtil from "../../utils/logUtil";
 
 type RemoveCommentFormatResultType = {
   line: string;
@@ -12,7 +11,7 @@ type RemoveCommentFormatResultType = {
 };
 
 export default class TypescriptAdapter implements LanguageAdapterInterface {
-  supertedLanguageId: string[] = [
+  supportedLanguageId: string[] = [
     "typescript",
     "javascript",
     "javascriptreact",

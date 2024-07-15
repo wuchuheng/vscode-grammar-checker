@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { DiagnasticStore } from "../../store/diagnasticStore";
+import { DiagnosticStore } from "../../store/diagnosticStore";
 import { diagnosticCollection } from "../../diagnosticCollection/diagnosticCollection";
 import { debounce } from "@wuchuhengtools/helper";
 import LogUtil from "../../utils/logUtil";
@@ -19,7 +19,7 @@ export const getChangedType = (
     return "delete";
   }
 
-  // 2.2 If the length of the text is not empty, but the range length is empty, return "insert".
+  // 2.2 If the text length is not empty, but the range length is empty, return "insert".
   if (change.text !== "" && change.rangeLength === 0) {
     return "insert";
   }
@@ -69,7 +69,7 @@ export const getAdjustedDiagnostics = (
 
       // 2.2.2 If the change is before the diagnostic range, adjust the start and end.
       if (range.end.isBefore(diagnostic.range.start)) {
-        // Change before the diagnostic range, adjust start and end
+        // Change before the diagnostic range, adjust the start and end
         const lineDelta =
           text.split("\n").length - 1 - (range.end.line - range.start.line);
         const charDelta =
@@ -89,7 +89,7 @@ export const getAdjustedDiagnostics = (
         const end = diagnostic.range.end.translate(lineDelta, charDelta);
         diagnostic.range = new vscode.Range(start, end);
       } else if (range.intersection(diagnostic.range)) {
-        // Change intersects with the diagnostic range, adjust or invalidate diagnostic
+        // Change intersects with the diagnostic range, adjust or invalidate the diagnostic.
         const newRange = new vscode.Range(
           diagnostic.range.start,
           diagnostic.range.end
@@ -106,29 +106,29 @@ export const getAdjustedDiagnostics = (
 
 /**
  * Compare the changes between the previous and current changes.
- * @param previouseChanges
+ * @param previousChanges
  * @param currentChanges
  */
 export const isSameChanges = (
-  previouseChanges: readonly vscode.TextDocumentContentChangeEvent[],
+  previousChanges: readonly vscode.TextDocumentContentChangeEvent[],
   currentChanges: readonly vscode.TextDocumentContentChangeEvent[]
 ): boolean => {
   // 1. Handling input.
   // 2. Process logic.
   // 2.1 If the length of the previous changes is not equal to the length of the current changes, return false.
-  if (previouseChanges.length !== currentChanges.length) {
+  if (previousChanges.length !== currentChanges.length) {
     return false;
   }
 
   // 2.1 Compare each change.
-  for (const [index, previouseChange] of previouseChanges.entries()) {
+  for (const [index, previousChange] of previousChanges.entries()) {
     // 2.1.1 If the range of the previous change is not equal to the range of the current change, return false.
-    if (!previouseChange.range.isEqual(currentChanges[index].range)) {
+    if (!previousChange.range.isEqual(currentChanges[index].range)) {
       return false;
     }
 
     // 2.1.2 If the text of the previous change is not equal to the text of the current change, return false.
-    if (previouseChange.text !== currentChanges[index].text) {
+    if (previousChange.text !== currentChanges[index].text) {
       return false;
     }
   }
@@ -148,17 +148,17 @@ export const updateHoverInformation = (
   // 2. Process logic.
   // 2.1 Get the list of diagnostics from the store and build the new values.
   const newValues = newDiagnostics.map((value) => {
-    const newItem = DiagnasticStore.get({ fileName, id: value.code as number });
+    const newItem = DiagnosticStore.get({ fileName, id: value.code as number });
     newItem.diagnostic = value;
     return newItem;
   });
 
   // 2.2 Clear the old values.
-  DiagnasticStore.clear(fileName);
+  DiagnosticStore.clear(fileName);
 
   // 2.3 Set the new values.
   newValues.forEach((value) => {
-    DiagnasticStore.set({
+    DiagnosticStore.set({
       fileName,
       id: value.diagnostic.code as number,
       value,

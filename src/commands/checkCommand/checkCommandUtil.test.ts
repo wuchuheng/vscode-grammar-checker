@@ -1,13 +1,13 @@
 import { describe, test } from "mocha";
 import {
   RemovedChartType,
-  removeInvalideChart,
+  removeInvalidedChart,
   restoreRemovedText,
 } from "./checkCommandUtil";
 import * as assert from "assert";
 
 describe("CheckCommandUtil test", () => {
-  const unformatedText: string[] = [
+  const unformattedText: string[] = [
     "  ",
     "  test1",
     "test2",
@@ -15,7 +15,7 @@ describe("CheckCommandUtil test", () => {
     "test4",
     "  ",
   ];
-  const formatedText: string[] = ["test1", "test2", "test3", "test4"];
+  const formattedText: string[] = ["test1", "test2", "test3", "test4"];
   const removedTextList: RemovedChartType[] = [
     { lineIndex: 0, prefix: "  ", isEntireLine: true },
     { lineIndex: 1, prefix: "  ", isEntireLine: false },
@@ -25,16 +25,16 @@ describe("CheckCommandUtil test", () => {
     { lineIndex: 5, prefix: "  ", isEntireLine: true },
   ];
 
-  test("Test function removeInvalideChart ", () => {
-    const result = removeInvalideChart(unformatedText);
+  test("Test function removeInvalidedChart ", () => {
+    const result = removeInvalidedChart(unformattedText);
 
-    assert.deepEqual(result.value, formatedText);
+    assert.deepEqual(result.value, formattedText);
 
     assert.deepEqual(result.removedTextList, removedTextList);
   });
 
   test(" Test function restoreRemovedText ", () => {
-    const result = restoreRemovedText(formatedText, removedTextList);
-    assert.deepEqual(result, unformatedText);
+    const result = restoreRemovedText(formattedText, removedTextList);
+    assert.deepEqual(result, unformattedText);
   });
 });

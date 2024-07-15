@@ -9,13 +9,11 @@ export type HoverInformation = {
 };
 
 /**
- * This class will be hold the hover information for each file. and the information will be used to show the hover information when the user hover the position within the range of the diagnostic.
- * Why we need this class? Because the hovered position within the range of the diagnostic is not binded to the esential information to show the hover information, so we need to bind the essential information to the diagnostic.and then the diagnostic will be used to show the hover information when the user hover the position within the range of the diagnostic.
- * In other words, I want to show the freidnly information when the user hover the position within the range of the diagnostic. But there is not enough information to show the friendly information. So I need to bind the friendly information to the diagnostic.
- * So, this class just be used to do the binding.
+ * In other words, I want to show friendly information when the user hovers the position within the range of the diagnostic. But there is not enough information to show friendly information. So, I need to bind the friendly information to the diagnostic.
+ * So, this class is just used to do the binding.
  */
-export class DiagnasticStore {
-  private static _fileMapDiagnaticMap: Map<
+export class DiagnosticStore {
+  private static _fileMapDiagnosticMap: Map<
     string,
     Map<number, HoverInformation>
   > = new Map();
@@ -25,20 +23,20 @@ export class DiagnasticStore {
   ): Map<number, HoverInformation> {
     // 1. Handling input.
     // 2. Processing logic.
-    // 2.1 If the key is not exist in the map, and then create it.
-    if (!this._fileMapDiagnaticMap.has(fileName)) {
-      this._fileMapDiagnaticMap.set(fileName, new Map());
+    // 2.1 If the key does not exist in the map, then create it.
+    if (!this._fileMapDiagnosticMap.has(fileName)) {
+      this._fileMapDiagnosticMap.set(fileName, new Map());
     }
 
     // 2.2 Get the item from the map.
-    const result = this._fileMapDiagnaticMap.get(fileName)!;
+    const result = this._fileMapDiagnosticMap.get(fileName)!;
 
     // 3. Return result.
     return result;
   }
 
   /**
-   *  Set the hoverInfomation for a specific file.
+   *  Set the hoverInformation for a specific file.
    * @param inputValue
    */
   static set(inputValue: {
@@ -56,13 +54,13 @@ export class DiagnasticStore {
     fileDiagnosticMap.set(inputValue.id, inputValue.value);
 
     // 2.3 Update the map.
-    this._fileMapDiagnaticMap.set(inputValue.fileName, fileDiagnosticMap);
+    this._fileMapDiagnosticMap.set(inputValue.fileName, fileDiagnosticMap);
 
     // 3. Return result.
   }
 
   /**
-   *  Set the list of hoverInfomation for a specific file.
+   *  Set the list of hoverInformation for a specific file.
    * @param inputValues
    */
   static setMany(inputValues: {
@@ -83,29 +81,29 @@ export class DiagnasticStore {
     }
 
     // 2.3 Update the map.
-    this._fileMapDiagnaticMap.set(inputValues.fileName, fileDiagnosticMap);
+    this._fileMapDiagnosticMap.set(inputValues.fileName, fileDiagnosticMap);
 
     // 3. Return result.
   }
 
   /**
-   *  Get the hoverInfomation for a specific file and position.
+   *  Get the hoverInformation for a specific file and position.
    * @param data
    */
   static get(value: { fileName: string; id: number }): HoverInformation {
     // 1. Handling input.
     // 1.1 Check if the key `fileName` is exist in the map.
-    if (!this._fileMapDiagnaticMap.has(value.fileName)) {
+    if (!this._fileMapDiagnosticMap.has(value.fileName)) {
       throw new Error(
-        `File ${value.fileName} does not have any hoverInfomation.`
+        `File ${value.fileName} does not have any hoverInformation.`
       );
     }
 
-    // 1.2 Check if the key `id` is exist in the map.
-    const fileDiagnosticMap = this._fileMapDiagnaticMap.get(value.fileName)!;
+    // 1.2 Check if the key `id` exists in the map.
+    const fileDiagnosticMap = this._fileMapDiagnosticMap.get(value.fileName)!;
     if (!fileDiagnosticMap.has(value.id)) {
       throw new Error(
-        `The id ${value.id} does not exist in the hoverInfomation.`
+        `The id ${value.id} does not exist in the hoverInformation.`
       );
     }
 
@@ -117,41 +115,41 @@ export class DiagnasticStore {
   }
 
   /**
-   * Remove the hoverInfomation for a specific file and code.
+   * Remove the hoverInformation for a specific file and code.
    */
   static clear(fileName: string): void {
     // 1. Handling input.
-    // 1.1 If the key is not existed in the map, and then return.
-    if (!this._fileMapDiagnaticMap.has(fileName)) {
+    // 1.1 If the key does not exist in the map, then return.
+    if (!this._fileMapDiagnosticMap.has(fileName)) {
       return;
     }
 
     // 2. Processing logic.
     // 2.1 Remove the item from the map.
-    this._fileMapDiagnaticMap.delete(fileName);
+    this._fileMapDiagnosticMap.delete(fileName);
 
     // 3. Return result.
   }
 
   /**
-   *  Remove the hoverInfomation for a specific file and code.
+   *  Remove the hoverInformation for a specific file and code.
    * @param inputValue
    */
   static delete(inputValue: { fileName: string; id: number }): void {
     // 1. Handling input.
-    // 1.1 Check if the key `fileName` is exist in the map.
-    if (!this._fileMapDiagnaticMap.has(inputValue.fileName)) {
+    // 1.1 Check if the key `fileName` exists in the map.
+    if (!this._fileMapDiagnosticMap.has(inputValue.fileName)) {
       throw new Error(
-        `File ${inputValue.fileName} does not have any hoverInfomation.`
+        `File ${inputValue.fileName} does not have any hoverInformation.`
       );
     }
-    // 1.2 Check if the key `id` is exist in the map.
-    const fileDiagnosticMap = this._fileMapDiagnaticMap.get(
+    // 1.2 Check if the key `id` exists in the map.
+    const fileDiagnosticMap = this._fileMapDiagnosticMap.get(
       inputValue.fileName
     )!;
     if (!fileDiagnosticMap.has(inputValue.id)) {
       throw new Error(
-        `The id ${inputValue.id} does not exist in the hoverInfomation.`
+        `The id ${inputValue.id} does not exist in the hoverInformation.`
       );
     }
 
@@ -160,7 +158,7 @@ export class DiagnasticStore {
     fileDiagnosticMap.delete(inputValue.id);
 
     // 2.2 Update the map.
-    this._fileMapDiagnaticMap.set(inputValue.fileName, fileDiagnosticMap);
+    this._fileMapDiagnosticMap.set(inputValue.fileName, fileDiagnosticMap);
 
     // 3. Return result.
   }

@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
 import { Comment } from "../adapters/typescriptAdapter/typescriptUtil";
 import { fixCommandIdentifier } from "../config/config";
-import { DiagnasticStore, HoverInformation } from "../store/diagnasticStore";
+import { DiagnosticStore, HoverInformation } from "../store/diagnosticStore";
 import { diagnosticCollection } from "../diagnosticCollection/diagnosticCollection";
-import { reloadDiagnosticCollection } from "../utils/diagnasticUtil";
+import { reloadDiagnosticCollection } from "../utils/diagnosticUtil";
 import { ChangedOperation } from "../utils/compareSentenceUtil";
 import LanguageAdapterManager from "../adapters/languageAdapterManager";
 import { setFlashState } from "../store/isChangeFromActionCodeStore";
@@ -27,14 +27,14 @@ export const fixCommand = vscode.commands.registerCommand(
     // 1.1 Validate the command.
     const supertedLangIds = LanguageAdapterManager.getAdapter(
       document.languageId
-    ).supertedLanguageId;
+    ).supportedLanguageId;
     if (!supertedLangIds.includes(document.languageId)) {
       console.error(`The file: ${document.fileName} is not supported.`);
       return;
     }
 
     // 2. Processing logic.
-    // 2.1 Set the state to true. this state will be used to check if the changes are from the action code or not.
+    // 2.1 Set the state to true. This state will be used to check if the changes are from the action code or not.
     setFlashState(true);
     // 2.2 Update the document content with the range.
     const replacedWord = hoverInformation.edition.toWord;
@@ -65,7 +65,7 @@ export const fixCommand = vscode.commands.registerCommand(
 
     // 2.3 Update the hover information.
     // 2.3.1 Remove the hover information from the store.
-    DiagnasticStore.delete({
+    DiagnosticStore.delete({
       fileName: document.fileName,
       id: inputDiagnostic.code as number,
     });

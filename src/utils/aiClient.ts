@@ -2,7 +2,7 @@ import { API_URL, getSecretKey, MODEL_ID } from "../config/config";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions.mjs";
 import axios from "axios";
 
-const AiClient = async (
+const AiRequest = async (
   messages: Array<ChatCompletionMessageParam>
 ): Promise<string> => {
   const secretKey = await getSecretKey();
@@ -21,4 +21,4 @@ const AiClient = async (
   return content;
 };
 
-export default AiClient;
+export default AiRequest;

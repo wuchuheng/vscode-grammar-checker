@@ -27,12 +27,12 @@ export const getApiKeyFromHtmlPanel = (): Promise<string> => {
       (message) => {
         switch (message.command) {
           case "saveApiKey":
-            // Resolve the promise with the API key.
+            // Resolve the promise using the API key.
             const aipKey = message.apiKey;
             pendingTasks.forEach((task) => task(aipKey));
             pendingTasks = [];
             resolve(aipKey);
-            // Close the panel
+            // Close the panel.
             panel.dispose();
             return;
           case "openWebsite":

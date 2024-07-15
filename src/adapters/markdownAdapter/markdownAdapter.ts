@@ -6,7 +6,7 @@ import { Comment } from "../typescriptAdapter/typescriptUtil";
 import { markdownPrompt } from "../../prompts/markdownPrompt";
 
 export default class MarkdownAdapter implements LanguageAdapterInterface {
-  supertedLanguageId: string[] = ["markdown"];
+  supportedLanguageId: string[] = ["markdown"];
 
   extractComments(document: TextDocument): Comment[] {
     const comments: Comment[] = document
