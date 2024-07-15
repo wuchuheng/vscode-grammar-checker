@@ -2,6 +2,7 @@ import { ChatCompletionMessageParam } from "openai/resources/chat/completions.mj
 import AiRequest from "../../utils/aiClient";
 import { grammarCheckPrompt } from "../../prompts/typescriptPrompt";
 import { removeCodeFormatting } from "../../utils/markdownUtil";
+import LogUtil from "../../utils/logUtil";
 
 /**
  * Check if a string is a valid grammar in english.
@@ -31,6 +32,14 @@ export const isGrammarCorrect = async (data: string): Promise<boolean> => {
   // 2.5 Create the result.
   const result = content === "yes";
 
-  // 3. Return the result.
+  // 2.6 Log the result.
+  LogUtil.debug(
+    `Check if the grammar is correct or not.
+Result: ${result ? "Correct" : "Incorrect"}
+Input data: ${data}
+`
+  );
+
+  // 3. Return the ersult.
   return result;
 };

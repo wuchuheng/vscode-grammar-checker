@@ -7,7 +7,7 @@ import MarkdownAdapter from "../adapters/markdownAdapter/markdownAdapter";
 // The endpoint url for accessing the API of the language model.
 export const API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
 
-// The model id of the language model.
+// The model's ID of the language model.
 export const MODEL_ID = "glm-4-flash";
 // export const MODEL_ID = "glm-4";
 
@@ -33,7 +33,7 @@ export const checkCommandIdentifier = "GrammarChecker.check";
 export const removedApiKeyCommandIdentifier = "GrammarChecker.removeApiKey";
 
 /**
- * The list of language adapters that are used to correct the comments in the supported programming languages.
+ * The list of language adapters used to correct comments in the supported programming languages.
  */
 export const adapterList: LanguageAdapterInterface[] = [
   new TypescriptAdapter(),

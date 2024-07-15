@@ -4,6 +4,7 @@ import LanguageAdapterInterface, {
 } from "../languageAdapter.interface";
 import { Comment, extractComments } from "./typescriptUtil";
 import { typescriptPrompt } from "../../prompts/typescriptPrompt";
+import { isGrammarCorrect } from "../../api/grammar/grammar";
 
 type RemoveCommentFormatResultType = {
   line: string;
@@ -95,16 +96,18 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
       prompt: typescriptPrompt,
       data,
     };
-    let response = await next(args);
+
+    const isOk = await isGrammarCorrect(data.join("\n"));
+
+    let response = isOk ? data : await next(args);
 
     // 2.3 Remove the prefix of the comment, like: `//` and `*` before the comment, because the character is removed before sending the request, and if the response contains the character, the character should be removed.
     const removedResult =
       requestArgs.commentType === "track"
         ? this.removeTrackLineCommentFormat(response)
         : this.removeSingleLineCommentFormat(response);
-    response = removedResult.map((comment) => comment.line);
 
-    const result = response;
+    const result = removedResult.map((comment) => comment.line);
 
     // 2.4 Restore the removed format for each line.
     lines.forEach((comment, index) => {

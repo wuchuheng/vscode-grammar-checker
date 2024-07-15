@@ -49,8 +49,10 @@ ${data}
   }
 
   // 2.3 Log.
-  LogUtil.debug(`AI input: ${data}`);
-  LogUtil.debug(`AI output: ${content}`);
+  LogUtil.debug(`AI response for the comment correction.
+Input data: ${data}
+Output data: ${content}
+`);
 
   // 2.4 Remove the wrapper of the content in markdown format
   content = content.trim();

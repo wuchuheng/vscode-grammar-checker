@@ -52,7 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
   });
 
-  // 7. Execute the command `grammarChecker.check` when the file is opened.
+  // 7. Execute the command `grammarChecker.check()` when the file is opened.
   vscode.workspace.onDidOpenTextDocument((document) => {
     if (document.languageId === "plaintext") {
       // Optionally execute the command for the currently open file on startup
