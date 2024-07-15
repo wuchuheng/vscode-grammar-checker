@@ -2,9 +2,16 @@ import * as vscode from "vscode";
 import LanguageAdapterInterface, {
   RequestData,
 } from "../languageAdapter.interface";
-import { Comment, extractComments } from "./typescriptUtil";
+import {
+  Comment,
+  extractComments,
+  getAffectedCommentsByDeleteChange,
+  getAffectedCommentsByInsertChange,
+  getAffectedCommentsByReplaceChange,
+} from "./typescriptUtil";
 import { typescriptPrompt } from "../../prompts/typescriptPrompt";
 import { isGrammarCorrect } from "../../api/grammar/grammar";
+import { getChangedType } from "../../providers/onDidChangeTextDocumentProvider/updateDiagnosticUtil";
 
 type RemoveCommentFormatResultType = {
   line: string;
@@ -72,6 +79,40 @@ export default class TypescriptAdapter implements LanguageAdapterInterface {
 
     // 3. Return the result.
     return result;
+  }
+
+  onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent): Comment[] {
+    // 2.1 Collect the comments that will be affected by the changes.
+    const commentsInDocument = this.extractComments(event.document);
+    const affectedComments: Comment[] = [];
+    for (const change of event.contentChanges) {
+      const changeType = getChangedType(change);
+      let currentAffectedComments: Comment[] = [];
+      switch (changeType) {
+        case "insert":
+          currentAffectedComments = getAffectedCommentsByInsertChange(
+            change,
+            commentsInDocument
+          );
+          break;
+        case "replace":
+          currentAffectedComments = getAffectedCommentsByReplaceChange(
+            change,
+            commentsInDocument
+          );
+          break;
+        case "delete":
+          currentAffectedComments = getAffectedCommentsByDeleteChange(
+            change,
+            commentsInDocument
+          );
+          break;
+      }
+      affectedComments.push(...currentAffectedComments);
+    }
+
+    // 3. Return the result.
+    return affectedComments;
   }
 
   async middlewareHandle({

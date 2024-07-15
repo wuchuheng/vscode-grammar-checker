@@ -1,4 +1,4 @@
-import { Position, TextDocument } from "vscode";
+import { Position, TextDocument, TextDocumentChangeEvent } from "vscode";
 import LanguageAdapterInterface, {
   RequestData,
 } from "../languageAdapter.interface";
@@ -22,6 +22,10 @@ export default class MarkdownAdapter implements LanguageAdapterInterface {
       });
 
     return comments;
+  }
+
+  onDidChangeTextDocument(event: TextDocumentChangeEvent): Comment[] {
+    return this.extractComments(event.document);
   }
 
   async middlewareHandle(args: {

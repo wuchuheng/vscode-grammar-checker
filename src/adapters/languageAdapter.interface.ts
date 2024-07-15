@@ -34,6 +34,24 @@ export default interface LanguageAdapterInterface {
   extractComments(document: vscode.TextDocument): Comment[];
 
   /**
+   * Handles text document changes and updates comments for diagnostics.
+   *
+   * This method is triggered when there are changes in a text document. It is responsible for providing updated comments
+   * that reflect the changes made to the document. These updated comments are then used to refresh diagnostics, ensuring
+   * that any analysis or feedback provided to the user is based on the most current state of the document.
+   *
+   * The method works by first determining the type of change (insert, delete, replace) and then identifying which comments
+   * are affected by this change. Once the affected comments are identified, it updates the diagnostics related to these
+   * comments by invoking the appropriate command with the updated comments.
+   *
+   * @param event - The event object that contains information about the text document change. This includes the document
+   *                itself and the range of text that has been changed.
+   * @returns An array of updated `Comment` objects that reflect the changes made to the document. These comments are used
+   *          to update diagnostics accordingly.
+   */
+  onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent): Comment[];
+
+  /**
    * The middleware to be executed before the request is made.
    *
    * The request will be executed like this:

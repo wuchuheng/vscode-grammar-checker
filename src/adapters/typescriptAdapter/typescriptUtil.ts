@@ -132,3 +132,76 @@ export function extractComments(
   visit(sourceFile);
   return comments;
 }
+
+/**
+ * Get the comments that will be affected by the insert change.
+ * @param change
+ */
+export function getAffectedCommentsByInsertChange(
+  change: vscode.TextDocumentContentChangeEvent,
+  commentsInDocument: Comment[]
+): Comment[] {
+  // 1. Handling input.
+  // 2. Processing logic.
+  const result: Comment[] = [];
+  for (const comment of commentsInDocument) {
+    // 2.1 If the change is in the comment, return the comment.
+    if (
+      change.range.start.line >= comment.start.line &&
+      change.range.end.line <= comment.end.line
+    ) {
+      result.push(comment);
+      break;
+    }
+  }
+
+  // 3. Return the result.
+  return result;
+}
+
+export function getAffectedCommentsByReplaceChange(
+  change: vscode.TextDocumentContentChangeEvent,
+  commentsInDocument: Comment[]
+): Comment[] {
+  // 1. Handling input.
+  // 2. Processing logic.
+  const result: Comment[] = [];
+  for (const comment of commentsInDocument) {
+    // 2.1 If the change is in the comment, return the comment.
+    if (
+      change.range.start.line >= comment.start.line &&
+      change.range.end.line <= comment.end.line
+    ) {
+      result.push(comment);
+      break;
+    }
+  }
+
+  // 3. Return the result.
+  return result;
+}
+
+export function getAffectedCommentsByDeleteChange(
+  change: vscode.TextDocumentContentChangeEvent,
+  commentsInDocument: Comment[]
+): Comment[] {
+  // 1. Handling input.
+  // 2. Processing logic.
+  const result: Comment[] = [];
+  for (const comment of commentsInDocument) {
+    // 2.1 If the change is in the comment.
+    if (
+      change.range.start.line >= comment.start.line &&
+      change.range.end.line <= comment.end.line
+    ) {
+      // 2.2 If the deleted content is not the whole comment, return the comment.
+      if (comment.text.length > change.text.length) {
+        result.push(comment);
+        break;
+      }
+    }
+  }
+
+  // 3. Return the result.
+  return result;
+}
