@@ -1,7 +1,10 @@
 import { describe, test } from "mocha";
 import * as fs from "fs";
 import * as path from "path";
-import { extractSingleLineComments } from "../commentUtil";
+import {
+  extractMultiLineComments,
+  extractSingleLineComments,
+} from "../commentUtil";
 import { Comment } from "../../../utils/diagnosticUtil";
 import * as vscode from "vscode";
 import * as assert from "assert";
@@ -88,6 +91,53 @@ const singleLineCommentExpectedValue: string = `
 ]
 `;
 
+const multiLineCommentExpectedValue = [
+  {
+    text: "/**\n*File: MultiLineCommentDemo.dart\n*\n*Calculates the factorial of a number.\n*\n*This function takes an integer `n` and returns its factorial.\n*The factorial of a number is the product of all positive integers less than or equal to that number.\n*For example, the factorial of 5 (5!) is 5 * 4 * 3 * 2 * 1 = 120.\n*\n*Note: The factorial of 0 is defined to be 1.\n*/",
+    start: {
+      line: 10,
+      character: 0,
+    },
+    end: {
+      line: 10,
+      character: 2,
+    },
+  },
+  {
+    text: "/*Calculates the nth Fibonacci number.\n\nThe Fibonacci sequence is a series of numbers where each number is the sum of the two preceding ones, starting from 0 and 1.\nThis function returns the nth number in the Fibonacci sequence.\n\n*/",
+    start: {
+      line: 27,
+      character: 0,
+    },
+    end: {
+      line: 27,
+      character: 2,
+    },
+  },
+  {
+    text: "/**\n     * If n is less than or equal to 0, return 0.\n     */",
+    start: {
+      line: 31,
+      character: 4,
+    },
+    end: {
+      line: 31,
+      character: 7,
+    },
+  },
+  {
+    text: "/** * If n is equal to 1, return 1.  */",
+    start: {
+      line: 34,
+      character: 8,
+    },
+    end: {
+      line: 34,
+      character: 47,
+    },
+  },
+];
+
 describe("Dart Adapter", () => {
   test("Should return a list of single line comments", () => {
     // 2. Processing logic.
@@ -117,5 +167,28 @@ describe("Dart Adapter", () => {
     assert.strictEqual(actualValue, expectedValue);
   });
 
-  test("Should return a list of multi line comments", () => {});
+  test("Should return a list of multi line comments", () => {
+    // 2. Processing logic.
+    // 2.1 Read the dart file.
+    const dartFile = path.resolve(
+      __dirname,
+      "../../../../src/adapters/dartAdapter/dartAdapter.test",
+      "TrackLineCommentDemo.dart"
+    );
+    const text = fs.readFileSync(dartFile, "utf-8");
+    // 2.2 Extract comments from the dart file.
+
+    const comments: Comment[] = [];
+    extractMultiLineComments(text, ({ text, startChart, endChart, line }) => {
+      comments.push({
+        text,
+        start: new vscode.Position(line, startChart),
+        end: new vscode.Position(line, endChart),
+      });
+    });
+    const expectedValue = JSON.stringify(multiLineCommentExpectedValue);
+    const actualValue = JSON.stringify(comments);
+
+    assert.strictEqual(actualValue, expectedValue);
+  });
 });
