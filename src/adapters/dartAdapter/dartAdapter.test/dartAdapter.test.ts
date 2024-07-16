@@ -116,4 +116,6 @@ describe("Dart Adapter", () => {
 
     assert.strictEqual(actualValue, expectedValue);
   });
+
+  test("Should return a list of multi line comments", () => {});
 });
