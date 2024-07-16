@@ -16,7 +16,6 @@ async function go() {
       // Set the path to the workspace file.
       launchArgs: [workspacePath],
     });
-    console.log("Tests passed");
   } catch (err) {
     console.error("Failed to run tests");
     process.exit(1);

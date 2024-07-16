@@ -1,7 +1,7 @@
 {
   "name": "grammar-checker",
   "displayName": "grammar checker",
-  "description": "A grammar checker incorect the pure text file in standard english grammar.",
+  "description": "A grammar checker incorrect the pure text file in standard english grammar.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.90.0"
@@ -75,7 +75,8 @@
     "pretest": "rm -rf out; pnpm run compile-tests && pnpm run compile && pnpm run lint",
     "lint": "eslint src --ext ts",
     "test": "node out/test/mainTest.js",
-    "test:tmp": "mocha -r ts-node/register tmp/tmp.test.ts --timeout 20000"
+    "test:tmp_electron": "pnpm pretest && node out/test/tmpTest/tmpTest.js",
+    "test:tmp": "mocha -r ts-node/register src/adapters/dartAdapter/dartAdapter.test/tmp.test.ts --timeout 2000000"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
