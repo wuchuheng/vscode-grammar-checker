@@ -21,14 +21,14 @@ const AiRequest = async (
   );
   const content = response.data.choices[0].message.content;
 
-  // 2.2 Fees used under statistics
+  // 2.2 Cost used under statistics
   const { completion_tokens, prompt_tokens, total_tokens } =
     response.data.usage;
-  const totalFeel = ((total_tokens / 1000) * 0.0001)
+  const totalCost = ((total_tokens / 1000) * 0.0001)
     .toString()
     .padStart(6, "0");
   LogUtil.debug(
-    `Token usage: completion_tokens: ${completion_tokens} prompt_tokens: ${prompt_tokens} total_tokens: ${total_tokens} Fee: ${totalFeel} RMB `
+    `Token usage: completion_tokens: ${completion_tokens} prompt_tokens: ${prompt_tokens} total_tokens: ${total_tokens} Cost: ${totalCost} RMB `
   );
 
   // 3. Return the result.
